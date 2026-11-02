@@ -43,15 +43,17 @@ final class Names
         'ne' => ['आइत', 'सोम', 'मङ्गल', 'बुध', 'बिहि', 'शुक्र', 'शनि'],
     ];
 
-    private const string ASCII_DIGITS = '0123456789';
-    private const string DEVANAGARI_DIGITS = '०१२३४५६७८९';
+    private const array DIGIT_MAP = [
+        '0' => '०', '1' => '१', '2' => '२', '3' => '३', '4' => '४',
+        '5' => '५', '6' => '६', '7' => '७', '8' => '८', '9' => '९',
+    ];
 
     /** Format `$n` in ASCII, zero-padded to `$minWidth`, then map the digits to Devanagari. */
     public static function toNepaliDigits(int $n, int $minWidth = 0): string
     {
         $ascii = str_pad((string) $n, $minWidth, '0', STR_PAD_LEFT);
 
-        return strtr($ascii, self::ASCII_DIGITS, self::DEVANAGARI_DIGITS);
+        return strtr($ascii, self::DIGIT_MAP);
     }
 
     /** The digit string for `$n` (0..32) in `$lang`, zero-padded to two digits when `$pad`. */
@@ -59,7 +61,7 @@ final class Names
     {
         $text = $pad ? str_pad((string) $n, 2, '0', STR_PAD_LEFT) : (string) $n;
 
-        return $lang === \NepDate\Lang::Ne ? strtr($text, self::ASCII_DIGITS, self::DEVANAGARI_DIGITS) : $text;
+        return $lang === \NepDate\Lang::Ne ? strtr($text, self::DIGIT_MAP) : $text;
     }
 
     /** The four-digit year string for `$year` in `$lang`. */
@@ -67,7 +69,7 @@ final class Names
     {
         $text = (string) $year;
 
-        return $lang === \NepDate\Lang::Ne ? strtr($text, self::ASCII_DIGITS, self::DEVANAGARI_DIGITS) : $text;
+        return $lang === \NepDate\Lang::Ne ? strtr($text, self::DIGIT_MAP) : $text;
     }
 
     /** The two-digit year string for `$year % 100` in `$lang`. */
@@ -75,6 +77,6 @@ final class Names
     {
         $text = str_pad((string) $yearMod100, 2, '0', STR_PAD_LEFT);
 
-        return $lang === \NepDate\Lang::Ne ? strtr($text, self::ASCII_DIGITS, self::DEVANAGARI_DIGITS) : $text;
+        return $lang === \NepDate\Lang::Ne ? strtr($text, self::DIGIT_MAP) : $text;
     }
 }
