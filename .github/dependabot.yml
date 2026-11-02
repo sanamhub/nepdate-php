@@ -1,0 +1,24 @@
+version: 2
+updates:
+  # Keeps the pinned action SHAs current. The cooldown gives a bad release two weeks to be pulled.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 14
+  - package-ecosystem: composer
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 14
+  - package-ecosystem: composer
+    directory: /packages/nepdate-patro
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 14

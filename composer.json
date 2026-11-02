@@ -1,0 +1,80 @@
+{
+    "name": "sanamhub/nepdate",
+    "description": "Bikram Sambat (Nepali) dates for PHP: conversion, arithmetic, formatting, parsing and ranges, ported from the C# NepDate reference implementation.",
+    "type": "library",
+    "license": "MIT",
+    "version": "0.2.0-rc.1",
+    "homepage": "https://github.com/sanamhub/nepdate-php",
+    "keywords": [
+        "nepali-date",
+        "bikram-sambat",
+        "bs-date",
+        "nepali-calendar",
+        "date"
+    ],
+    "authors": [
+        {
+            "name": "Sanam Pakuwal",
+            "homepage": "https://github.com/sanamhub"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/sanamhub/nepdate-php/issues",
+        "source": "https://github.com/sanamhub/nepdate-php"
+    },
+    "require": {
+        "php": "^8.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "12.5.40",
+        "phpstan/phpstan": "2.3.1",
+        "friendsofphp/php-cs-fixer": "3.95.27",
+        "sanamhub/nepdate-patro": "@dev"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/nepdate-patro",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "NepDate\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "NepDate\\Tests\\": "tests/",
+            "NepDate\\Patro\\Tests\\": "packages/nepdate-patro/tests/"
+        }
+    },
+    "scripts": {
+        "codegen": [
+            "php scripts/generate-tables.php",
+            "php packages/nepdate-patro/scripts/generate-patro-tables.php"
+        ],
+        "codegen:check": [
+            "php scripts/generate-tables.php --check",
+            "php packages/nepdate-patro/scripts/generate-patro-tables.php --check"
+        ],
+        "test": "phpunit",
+        "stan": "phpstan analyse",
+        "cs": "php-cs-fixer fix --dry-run --diff",
+        "cs:fix": "php-cs-fixer fix",
+        "ci": [
+            "@codegen:check",
+            "@cs",
+            "@stan",
+            "@test"
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": false
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

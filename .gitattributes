@@ -1,0 +1,10 @@
+* text=auto eol=lf
+*.php text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.tsv text eol=lf
+*.csv text eol=lf
+*.yml text eol=lf
+/shared/** -diff linguist-generated=true
+/src/Internal/*.php linguist-generated=true
+/packages/nepdate-patro/src/Internal/*.php linguist-generated=true

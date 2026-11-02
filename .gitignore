@@ -1,0 +1,8 @@
+/vendor/
+/packages/nepdate-patro/vendor/
+/.phpunit.cache/
+/build/
+*.cache
+.php-cs-fixer.cache
+/bench/results/
+.DS_Store
