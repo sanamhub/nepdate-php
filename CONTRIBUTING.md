@@ -31,7 +31,27 @@ described in [SECURITY.md](SECURITY.md), not in a public issue.
 6. Use [Conventional Commits](https://www.conventionalcommits.org/), for example
    `feat(nepdate): add serial conversion`.
 7. Commit messages and docs: imperative summary, lower case, no trailing period; the body says
-   why, not what.
+   why, not what. Docs are plain prose without em dashes and without emoji.
+
+## Documentation
+
+`README.md` and `docs/API.md` are executable. A line of the form
+
+```php
+$date->isoformat(); // => '2081-04-15'
+```
+
+is run and checked by `composer docs:check`, and `composer ci` runs it, so a doc example cannot
+drift from the code. A line ending `// => throws NepDateException(InvalidDay)` asserts the error
+kind instead. Write `not measured` rather than guessing a benchmark figure.
+
+## Benchmarks
+
+`php bench/run.php` is the harness of `shared/spec/BENCHMARK.md`: B1 to B8 over the shared 64 dates
+and the two competitor rows of `docs/competitors.md`. `bench/CoreBench.php` is the same operations
+under PHPBench, for a regression check. Change a number in `docs/benchmarks.md` only together with a
+run, and say on which machine it was measured.
+
 
 ## Generated files
 

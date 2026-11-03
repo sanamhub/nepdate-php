@@ -2,9 +2,30 @@
 *.php text eol=lf
 *.md text eol=lf
 *.json text eol=lf
+*.json5 text eol=lf
 *.tsv text eol=lf
 *.csv text eol=lf
 *.yml text eol=lf
 /shared/** -diff linguist-generated=true
 /src/Internal/*.php linguist-generated=true
 /packages/nepdate-patro/src/Internal/*.php linguist-generated=true
+
+# What a Composer archive leaves out: the released package needs its source, its manifest, the
+# licence and the readme, and nothing else (ADR-0007).
+/tests export-ignore
+/.github export-ignore
+/docs export-ignore
+/bench export-ignore
+/shared export-ignore
+/scripts export-ignore
+/packages export-ignore
+/phpstan.neon export-ignore
+/.php-cs-fixer.php export-ignore
+/phpunit.xml export-ignore
+/infection.json5 export-ignore
+/.editorconfig export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
+
+/packages/nepdate-patro/scripts export-ignore
+/.editorconfig export-ignore
