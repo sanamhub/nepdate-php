@@ -7,6 +7,8 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.0-rc.1] - 2026-11-03
+
 ### Added
 
 - `NepaliDate` with construction (`fromBs`, `fromGregorian`, `today`, `min`, `max`), accessors,
