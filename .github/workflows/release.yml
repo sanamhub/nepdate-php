@@ -1,0 +1,164 @@
+# One tag vX.Y.Z releases both packages on the hub's lockstep line (ADR-0004 decision 2, ADR-0005).
+# Packagist reads the repository, so there is no upload: this workflow runs every gate, builds the
+# source archives, attests them and creates the release. A manual dispatch runs the gates and the
+# packaging and never creates anything. The split mirror push needs the `production` environment.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Run the gates and the packaging, create nothing
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    env:
+      EVENT_NAME: ${{ github.event_name }}
+      REF_NAME: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: "8.3"
+          coverage: none
+          tools: composer
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - name: Run every gate
+        run: composer ci
+      - name: Read and validate the version
+        id: version
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "push" ]; then
+            php scripts/version.php --check-tag "$REF_NAME"
+          fi
+          echo "version=$(php scripts/version.php)" >> "$GITHUB_OUTPUT"
+      - name: Check the manifests and the changelog
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: php scripts/release-check.php "$VERSION"
+      - name: Build the source archives
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          git archive --format=zip --prefix="nepdate-$VERSION/" \
+            -o "dist/nepdate-$VERSION.zip" HEAD
+          git archive --format=zip --prefix="nepdate-patro-$VERSION/" \
+            -o "dist/nepdate-patro-$VERSION.zip" HEAD:packages/nepdate-patro
+          (cd dist && sha256sum ./*.zip > SHA256SUMS)
+      - name: Check the archives hold the packages and not the tooling
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          for name in nepdate nepdate-patro; do
+            mkdir -p "unpack/$name"
+            unzip -q "dist/$name-$VERSION.zip" -d "unpack/$name"
+            test -f "unpack/$name/$name-$VERSION/composer.json"
+            test -d "unpack/$name/$name-$VERSION/src"
+            test ! -e "unpack/$name/$name-$VERSION/tests"
+          done
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-archives
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  # The patro package lives in packages/nepdate-patro, and Packagist reads one repository per
+  # package, so the package is pushed to a read-only mirror first (ADR-0005).
+  split:
+    needs: pack
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Push packages/nepdate-patro to its mirror
+        env:
+          MIRROR_TOKEN: ${{ secrets.MIRROR_TOKEN }}
+          VERSION: ${{ needs.pack.outputs.version }}
+        run: |
+          set -euo pipefail
+          if [ -z "$MIRROR_TOKEN" ]; then
+            echo "::error::the production environment needs a MIRROR_TOKEN secret with write access to sanamhub/nepdate-patro"
+            exit 1
+          fi
+          split="$(git subtree split --prefix=packages/nepdate-patro HEAD)"
+          git push --force "https://x-access-token:$MIRROR_TOKEN@github.com/sanamhub/nepdate-patro.git" \
+            "$split:refs/heads/main" "refs/tags/v$VERSION:refs/tags/v$VERSION"
+
+  release:
+    needs: [pack, split]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: "8.3"
+          coverage: none
+          tools: composer
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-archives
+          path: dist
+      - name: Verify the checked archives
+        run: cd dist && sha256sum -c SHA256SUMS
+      - name: Attest the archives
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: dist/*.zip
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.pack.outputs.version }}
+        run: |
+          set -euo pipefail
+          php scripts/release-notes.php "$VERSION" > RELEASE_NOTES.md
+          prerelease=()
+          case "$VERSION" in *-*) prerelease=(--prerelease) ;; esac
+          gh release create "v$VERSION" dist/*.zip --title "v$VERSION" \
+            --notes-file RELEASE_NOTES.md --verify-tag "${prerelease[@]}"
+
+  verify:
+    needs: [pack, release]
+    permissions:
+      contents: read
+      issues: write
+    uses: ./.github/workflows/verify-published.yml
+    with:
+      version: ${{ needs.pack.outputs.version }}

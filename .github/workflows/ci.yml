@@ -1,0 +1,101 @@
+# Every gate of ADR-0006 on Linux, macOS and Windows over the supported PHP versions, plus the
+# coverage gate and the hub's shared-check. A green run here is the same gate a release runs.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # shared-sync starts CI this way on the PR it opens with GITHUB_TOKEN.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: php ${{ matrix.php }} on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        php: ["8.3", "8.4", "8.5"]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: composer
+      - name: Validate both manifests
+        run: composer validate --no-check-all
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - name: Run the full gate
+        run: composer ci
+
+  # The coverage gate of ADR-0006. PCOV keeps the run close to the uninstrumented one; the vector
+  # suites alone are 300,000 assertions, so only one runner measures them.
+  coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: "8.3"
+          coverage: pcov
+          tools: composer
+      - run: composer install --no-interaction --no-progress --prefer-dist
+      - name: Measure and enforce the coverage gate
+        run: |
+          mkdir -p build
+          php vendor/bin/phpunit --coverage-clover build/coverage.xml
+          php scripts/coverage-check.php build/coverage.xml 90
+      - name: Keep the report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: coverage
+          path: build/coverage.xml
+          if-no-files-found: warn
+          retention-days: 7
+
+  version:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: "8.3"
+          coverage: none
+          tools: composer
+      - name: Read and check the version both packages share
+        id: version
+        run: echo "version=$(php scripts/version.php)" >> "$GITHUB_OUTPUT"
+
+  # Fails when shared/ differs from the hub at the commit in shared/VERSION, and when this port is
+  # on another MAJOR.MINOR line (hub ADR-0007 decision 3). The sdk entry lands with the 0.2 line,
+  # so this step turns green when the hub branch for this port merges (docs/runbooks/release.md).
+  shared-check:
+    needs: version
+    permissions:
+      contents: read
+    uses: sanamhub/nepdate/.github/workflows/shared-check.yml@f636b7d476bc5959eb5689a950b73c8943860eef # main 2026-11-01
+    with:
+      sdk: php
+      version: ${{ needs.version.outputs.version }}

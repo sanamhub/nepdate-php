@@ -1,0 +1,41 @@
+name: Bug report
+description: A wrong result or an error that is not about the calendar data itself
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A wrong date, holiday or tithi comes from the shared data, not from this port: report that
+        in [sanamhub/nepdate](https://github.com/sanamhub/nepdate/issues). Report a security problem
+        privately as [SECURITY.md](https://github.com/sanamhub/nepdate-php/blob/main/SECURITY.md)
+        says, not here.
+  - type: input
+    id: version
+    attributes:
+      label: Package and version
+      description: The output of `composer show sanamhub/nepdate` and, if relevant, `sanamhub/nepdate-patro`.
+      placeholder: sanamhub/nepdate 0.2.0-rc.1
+    validations:
+      required: true
+  - type: input
+    id: php
+    attributes:
+      label: PHP version and operating system
+      placeholder: PHP 8.3.36 on Windows 11
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: A minimal snippet that shows the problem, the output you got and the output you expected.
+      render: php
+    validations:
+      required: true
+  - type: textarea
+    id: vectors
+    attributes:
+      label: A vector that covers it
+      description: If `shared/spec/vectors` has a row for this behaviour, name the file and the row.
+    validations:
+      required: false
