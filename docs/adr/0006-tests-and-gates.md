@@ -36,7 +36,7 @@ accepts one input C# rejects.
 
 ## Consequences
 
-- The suite is 23,305 tests and 321,355 assertions. The two large vector files (add-days, add-months)
+- The suite is 23,307 tests and 324,634 assertions over 29,215 vector rows. The two large vector files (add-days, add-months)
   take most of the 37 seconds.
 - `phpunit.xml` raises `memory_limit` to 512 MB because a few hundred thousand assertions and the
   109,212-date round trip do not fit in 128 MB.

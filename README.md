@@ -268,7 +268,7 @@ count(publicHolidays()); // => 294
 - The calendar tables are generated from the hub's `data/` at build time and committed as PHP
   constants; nothing is read at runtime (`docs/adr/0003-generated-tables.md`).
 - Every behavioural decision traces to the shared spec and to the golden vectors under
-  `shared/spec/vectors/`, 26,000 of which run in CI on every pull request.
+  `shared/spec/vectors/`, 29,000 of which run in CI on every pull request.
 
 ## Support
 
