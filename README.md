@@ -1,12 +1,46 @@
-# NepDate for PHP
+<p align="center">
+  <img src="https://raw.githubusercontent.com/sanamhub/nepdate-php/main/docs/assets/nepdate-php-128.png" width="128" alt="NepDate for PHP logo">
+</p>
 
-Bikram Sambat (the Nepali calendar) dates for PHP: conversion to and from Gregorian, arithmetic,
-formatting, parsing, ranges and fiscal years. Pure PHP 8.3, no extension and no runtime data file.
+<h1 align="center">nepdate-php</h1>
 
-A date is always a real day of the calendar, from 1901-01-01 to 2199-12-30 BS (1844-04-11 to
-2143-04-15 AD). There is no invalid or default date. The tithi, public holidays and events live in
-the separate [`sanamhub/nepdate-patro`](https://packagist.org/packages/sanamhub/nepdate-patro)
-package, so the core package carries no calendar data beyond the month lengths.
+<p align="center">
+  <a href="https://github.com/sanamhub/nepdate-php/actions/workflows/ci.yml"><img src="https://github.com/sanamhub/nepdate-php/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://packagist.org/packages/sanamhub/nepdate"><img src="https://img.shields.io/packagist/v/sanamhub/nepdate?include_prereleases&label=sanamhub%2Fnepdate&logo=packagist&logoColor=white" alt="sanamhub/nepdate on Packagist"></a>
+  <a href="https://packagist.org/packages/sanamhub/nepdate-patro"><img src="https://img.shields.io/packagist/v/sanamhub/nepdate-patro?include_prereleases&label=sanamhub%2Fnepdate-patro&logo=packagist&logoColor=white" alt="sanamhub/nepdate-patro on Packagist"></a>
+  <img src="https://img.shields.io/badge/php-%5E8.3-777BB4?logo=php&logoColor=white" alt="PHP ^8.3">
+  <a href="https://github.com/sanamhub/nepdate-php/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License: MIT"></a>
+</p>
+
+Bikram Sambat (Nepali calendar) dates for PHP: conversion to and from Gregorian, arithmetic,
+formatting, parsing, ranges and fiscal years. Part of the NepDate family: the shared data and spec
+live in the hub [`sanamhub/nepdate`](https://github.com/sanamhub/nepdate); the C# original is
+[NepDate](https://github.com/RajuPrasai/NepDate).
+
+> **Status:** 0.2.0-rc.1 is the first release of this port and is not tagged yet. The API is
+> listed in [docs/API.md](https://github.com/sanamhub/nepdate-php/blob/main/docs/API.md) and may
+> still change before 0.2.0. Patro data (tithi, holidays, events) is informational, not an official
+> calendar.
+
+- Two Composer packages, released together with the same version: `sanamhub/nepdate` (namespace
+  `NepDate`) and `sanamhub/nepdate-patro` (namespace `NepDate\Patro`) for tithi, public holidays
+  and events. The core carries no calendar data beyond the month lengths.
+- Pure PHP 8.3, no extension, no runtime dependency and no runtime data file.
+- BS 1901-01-01 to 2199-12-30 (AD 1844-04-11 to 2143-04-15). A date is always a real day of the
+  calendar; there is no invalid or default date. Same results as C# NepDate and the other ports,
+  checked against the shared vectors.
+- Framework-agnostic: Laravel, Symfony and plain PHP need no bridge and no service provider.
+
+## Install
+
+```sh
+composer require "sanamhub/nepdate:^0.2@rc"
+```
+
+The `@rc` flag is needed while only the release candidate exists; once 0.2.0 is out,
+`composer require sanamhub/nepdate` is enough.
+
+## Quick start
 
 ```php
 $date = NepaliDate::fromBs(2081, 4, 15);
@@ -15,20 +49,8 @@ $date->toDateTime()->format('Y-m-d'); // => '2024-07-30'
 $date->toLongString(weekday: true); // => 'Tuesday, Shrawan 15, 2081'
 ```
 
-## Install
-
-```sh
-composer require sanamhub/nepdate
-```
-
-The patro data is a second package:
-
-```sh
-composer require sanamhub/nepdate-patro
-```
-
-PHP 8.3, 8.4 and 8.5 are supported and tested on Linux, macOS and Windows. The packages are
-framework-agnostic: Laravel, Symfony and plain PHP need no bridge and no service provider.
+Every class lives in the `NepDate` namespace (`use NepDate\NepaliDate;`). The examples in this
+file are run and checked on every pull request.
 
 ## Dates
 
@@ -109,7 +131,8 @@ $date->daysUntil(NepaliDate::fromBs(2081, 5, 1)); // => 1
 $date->diff(NepaliDate::fromBs(2081, 5, 31))->days; // => 0
 ```
 
-`diff` returns the years, months and days breakdown of `ALGORITHM.md` §8a.
+`diff` returns the years, months and days breakdown of
+[`ALGORITHM.md`](https://github.com/sanamhub/nepdate/blob/main/spec/ALGORITHM.md) §8a.
 
 ```php
 $diff = NepaliDate::fromBs(2080, 1, 1)->diff(NepaliDate::fromBs(2081, 4, 15));
@@ -164,7 +187,9 @@ NepaliDate::parseLenient('Shrawan 15, 2081')->isoformat(); // => '2081-04-15'
 NepaliDate::tryParseLenient('2080/13/01'); // => null
 ```
 
-A failure carries the error kind of `PARSING.md` §4, so a caller can match on it.
+A failure carries the error kind of
+[`PARSING.md`](https://github.com/sanamhub/nepdate/blob/main/spec/PARSING.md) §4, so a caller can
+match on it.
 
 ```php
 try {
@@ -241,8 +266,15 @@ $today->addDays(1)->isTomorrow($zone); // => true
 
 ## Patro: tithi, holidays and events
 
-The `sanamhub/nepdate-patro` package answers one day at a time. It covers 2077-01-01 to 2084-08-20
-BS; every other date answers with no tithi, no holiday and no events, and never fails.
+The core has no patro data. Install both packages:
+
+```sh
+composer require "sanamhub/nepdate:^0.2@rc" "sanamhub/nepdate-patro:^0.2@rc"
+```
+
+The functions live in the `NepDate\Patro` namespace (`use function NepDate\Patro\info;`) and answer
+one day at a time. The data covers 2077-01-01 to 2084-08-20 BS; every other date answers with no
+tithi, no holiday and no events, and never fails.
 
 ```php
 $info = info(NepaliDate::fromBs(2081, 1, 1));
@@ -261,29 +293,76 @@ coverage()->end()->isoformat(); // => '2084-08-20'
 count(publicHolidays()); // => 294
 ```
 
-## Design
+## API
+
+The complete signatures, defaults and exceptions, with an example for every public item, are in
+the [API reference](https://github.com/sanamhub/nepdate-php/blob/main/docs/API.md).
+
+| Namespace | Public names |
+|---|---|
+| `NepDate` | `NepaliDate`, `NepaliDateRange`, `FiscalYear`, `DateDiff`, `Month`, `Weekday`, `Quarter`, `Lang`, `DateOrder`, `Separator`, `MonthOverflow`, `ErrorKind`, `NepDateException` |
+| `NepDate\Patro` | `CalendarInfo`, `Tithi`, `NepEvent`, `info()`, `coverage()`, `publicHolidays()` |
+
+The design in short:
 
 - Immutable value objects; every operation returns a new date.
 - Errors are exceptions with a `kind()`, never a boolean or a silently wrong date.
-- The calendar tables are generated from the hub's `data/` at build time and committed as PHP
-  constants; nothing is read at runtime (`docs/adr/0003-generated-tables.md`).
+- The calendar tables are generated from the hub's data at build time and committed as PHP
+  constants; nothing is read at runtime
+  ([ADR-0003](https://github.com/sanamhub/nepdate-php/blob/main/docs/adr/0003-generated-tables.md)).
 - Every behavioural decision traces to the shared spec and to the golden vectors under
   `shared/spec/vectors/`, 29,000 of which run in CI on every pull request.
 
-## Support
+## Supported versions
 
-- Supported PHP versions: 8.3, 8.4, 8.5, tested on Linux, macOS and Windows.
-- The current version line: `0.2`.
-- Security policy: [SECURITY.md](SECURITY.md). Changelog: [CHANGELOG.md](CHANGELOG.md).
-- API reference with an example for every public item: [docs/API.md](docs/API.md).
+- PHP 8.3, 8.4 and 8.5, tested on Linux, macOS and Windows.
+- The current version line is `0.2`. Both packages share one version number, and the other
+  [NepDate ports](https://github.com/sanamhub/nepdate#packages) follow the same line.
+- Security fixes go to the latest release only; see
+  [SECURITY.md](https://github.com/sanamhub/nepdate-php/blob/main/SECURITY.md).
 
-## Credits
+## Documentation
+
+| Page | What it covers |
+|---|---|
+| [API](https://github.com/sanamhub/nepdate-php/blob/main/docs/API.md) | The complete public surface, with an example for every item |
+| [Benchmarks](https://github.com/sanamhub/nepdate-php/blob/main/docs/benchmarks.md) | B1 to B8 against the other PHP libraries and C# NepDate |
+| [Competitors](https://github.com/sanamhub/nepdate-php/blob/main/docs/competitors.md) | The PHP libraries in the benchmark |
+| [ADRs](https://github.com/sanamhub/nepdate-php/blob/main/docs/adr/README.md) | Why the design is what it is |
+| [Release runbook](https://github.com/sanamhub/nepdate-php/blob/main/docs/runbooks/release.md) | How a version is checked, tagged and published |
+| [Changelog](https://github.com/sanamhub/nepdate-php/blob/main/CHANGELOG.md) | What changed in each version |
+| [Data error form](https://github.com/sanamhub/nepdate/issues/new/choose) | A wrong date, holiday or tithi, reported in the hub |
+| [Spec](https://github.com/sanamhub/nepdate/tree/main/spec) | Behaviour and vectors, in the hub |
+| [Other languages](https://github.com/sanamhub/nepdate#packages) | The same library for C#, Python, TypeScript, Rust, Go, C and more |
+
+## Benchmarks
+
+`bench/run.php` measures B1 to B8 of the shared benchmark protocol over the shared 64 dates, next to
+the two mature PHP libraries listed in
+[docs/competitors.md](https://github.com/sanamhub/nepdate-php/blob/main/docs/competitors.md). The
+current figures are preliminary; the method, the machine and the numbers are in
+[docs/benchmarks.md](https://github.com/sanamhub/nepdate-php/blob/main/docs/benchmarks.md).
+
+## Contributing
+
+Setup, the `composer ci` gate, the executable documentation and the commit style are in
+[CONTRIBUTING.md](https://github.com/sanamhub/nepdate-php/blob/main/CONTRIBUTING.md). This project
+follows the
+[Code of Conduct](https://github.com/sanamhub/nepdate-php/blob/main/CODE_OF_CONDUCT.md). Report a
+vulnerability privately as
+[SECURITY.md](https://github.com/sanamhub/nepdate-php/blob/main/SECURITY.md) says, and a data error
+in the hub.
+
+## Credit
 
 NepDate for PHP is a port of [NepDate](https://github.com/RajuPrasai/NepDate), the C# library by
-Raju Prasai, and follows the same conversion tables. The calendar data comes from
-[`sanamhub/nepdate`](https://github.com/sanamhub/nepdate), which derives it from that project. See
-[NOTICE](NOTICE).
+Raju Prasai and contributors, and follows the same conversion tables. The calendar data comes from
+the hub [`sanamhub/nepdate`](https://github.com/sanamhub/nepdate), which derives it from that
+project; see [NOTICE](https://github.com/sanamhub/nepdate-php/blob/main/NOTICE).
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT ([LICENSE](https://github.com/sanamhub/nepdate-php/blob/main/LICENSE)). Calendar data from
+NepDate by Raju Prasai and contributors, MIT
+([NOTICE](https://github.com/sanamhub/nepdate-php/blob/main/NOTICE)). Not affiliated with the
+Government of Nepal.
