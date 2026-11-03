@@ -1,0 +1,15 @@
+{
+    "$schema": "https://raw.githubusercontent.com/phpbench/phpbench/1.7.0/phpbench.schema.json",
+    "runner.bootstrap": "../vendor/autoload.php",
+    "runner.path": "CoreBench.php",
+    "runner.warmup": 1,
+    "runner.iterations": 5,
+    "runner.revs": 1,
+    "runner.time_unit": "microseconds",
+    "report.generators": {
+        "table": {
+            "extends": "aggregate",
+            "title": "NepDate B1-B8, one iteration per operation"
+        }
+    }
+}

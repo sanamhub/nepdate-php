@@ -1,0 +1,11 @@
+{
+    "description": "The competitor libraries docs/competitors.md selected, installed apart from the library's own dependencies so the benchmark never leaks into the package lock.",
+    "require": {
+        "anuzpandey/laravel-nepali-date": "3.3.0",
+        "ernilambar/nepali-date": "1.0.9",
+        "illuminate/support": "^13.39"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

@@ -1,0 +1,121 @@
+{
+    "php": "8.3.36",
+    "iterations": 20,
+    "inputs": 64,
+    "results": {
+        "B1": {
+            "label": "BS to AD (fromBs, then toDateTime)",
+            "unit": "core",
+            "measurement": {
+                "mean": 1456.484375,
+                "stddev": 156.7634337781674,
+                "iterations": 20,
+                "count": 64
+            }
+        },
+        "B2": {
+            "label": "AD to BS (fromGregorian)",
+            "unit": "core",
+            "measurement": {
+                "mean": 2427.1875,
+                "stddev": 103.21066517686047,
+                "iterations": 20,
+                "count": 64
+            }
+        },
+        "B3": {
+            "label": "add 1000 days",
+            "unit": "core",
+            "measurement": {
+                "mean": 2234.921875,
+                "stddev": 55.597945931453935,
+                "iterations": 20,
+                "count": 64
+            }
+        },
+        "B4": {
+            "label": "add 13 months, Clamp",
+            "unit": "core",
+            "measurement": {
+                "mean": 1792.96875,
+                "stddev": 118.76387665631962,
+                "iterations": 20,
+                "count": 64
+            }
+        },
+        "B5": {
+            "label": "long format, Nepali, with weekday",
+            "unit": "core",
+            "measurement": {
+                "mean": 1066.640625,
+                "stddev": 22.269188311361397,
+                "iterations": 20,
+                "count": 64
+            }
+        },
+        "B6": {
+            "label": "strict parse of YYYY\/MM\/DD",
+            "unit": "core",
+            "measurement": {
+                "mean": 2525.234375,
+                "stddev": 52.431770675534835,
+                "iterations": 20,
+                "count": 64
+            }
+        },
+        "B7": {
+            "label": "patro info (tithi, holiday, events)",
+            "unit": "patro",
+            "measurement": {
+                "mean": 2105.078125,
+                "stddev": 33.04188792157426,
+                "iterations": 20,
+                "count": 64
+            }
+        },
+        "B8": {
+            "label": "patro month grid (every day of the month)",
+            "unit": "patro",
+            "measurement": {
+                "mean": 115489.765625,
+                "stddev": 2068.5459134486046,
+                "iterations": 20,
+                "count": 64
+            }
+        }
+    },
+    "competitors": {
+        "anuzpandey\/laravel-nepali-date 3.3.0": {
+            "results": [
+                {
+                    "label": "BS to AD",
+                    "ns": 1470821.7741935481,
+                    "agrees": "60 of 64 (62 accepted)",
+                    "accepted": 62
+                },
+                {
+                    "label": "AD to BS (text)",
+                    "ns": 1676688.2258064516,
+                    "agrees": "60 of 64 (62 accepted)",
+                    "accepted": 62
+                }
+            ]
+        },
+        "ernilambar\/nepali-date 1.0.9": {
+            "results": [
+                {
+                    "label": "BS to AD",
+                    "ns": 5773986.7741935495,
+                    "agrees": "60 of 64 (62 accepted)",
+                    "accepted": 62
+                },
+                {
+                    "label": "AD to BS (text)",
+                    "ns": 4913110.322580645,
+                    "agrees": "60 of 64 (62 accepted)",
+                    "accepted": 62
+                }
+            ]
+        }
+    }
+}
