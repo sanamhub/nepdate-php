@@ -26,9 +26,12 @@
         "php": "^8.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "12.5.40",
-        "phpstan/phpstan": "2.3.1",
         "friendsofphp/php-cs-fixer": "3.95.27",
+        "infection/infection": "0.35.8",
+        "justinrainbow/json-schema": "6.13.1",
+        "phpbench/phpbench": "^1.7",
+        "phpstan/phpstan": "2.3.1",
+        "phpunit/phpunit": "12.5.40",
         "sanamhub/nepdate-patro": "@dev"
     },
     "repositories": [
@@ -48,7 +51,8 @@
     "autoload-dev": {
         "psr-4": {
             "NepDate\\Tests\\": "tests/",
-            "NepDate\\Patro\\Tests\\": "packages/nepdate-patro/tests/"
+            "NepDate\\Patro\\Tests\\": "packages/nepdate-patro/tests/",
+            "NepDate\\Bench\\": "bench/"
         }
     },
     "scripts": {
@@ -64,10 +68,12 @@
         "stan": "phpstan analyse",
         "cs": "php-cs-fixer fix --dry-run --diff",
         "cs:fix": "php-cs-fixer fix",
+        "docs:check": "php scripts/docs-check.php",
         "ci": [
             "@codegen:check",
             "@cs",
             "@stan",
+            "@docs:check",
             "@test"
         ]
     },

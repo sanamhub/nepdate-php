@@ -1,0 +1,27 @@
+{
+    "$schema": "https://raw.githubusercontent.com/infection/infection/0.35.8/resources/schema.json",
+    "source": {
+        "directories": [
+            "src",
+            "packages/nepdate-patro/src"
+        ],
+        "excludes": [
+            "Internal/CalendarTable.php",
+            "Internal/PatroTable.php"
+        ]
+    },
+    "logs": {
+        "text": "build/infection.log",
+        "html": "build/infection.html",
+        "summary": "build/infection-summary.log",
+        "perMutator": "build/infection-mutators.md"
+    },
+    "tmpDir": "build/infection",
+    "testFramework": "phpunit",
+    "testFrameworkOptions": "--testsuite=unit,vectors --no-coverage",
+    "timeout": 120,
+    "threads": "max",
+    "minMsi": 55,
+    "minCoveredMsi": 65,
+    "ignoreMsiWithNoMutations": false
+}

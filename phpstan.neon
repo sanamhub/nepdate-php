@@ -1,0 +1,18 @@
+parameters:
+    level: max
+    phpVersion: 80300
+    paths:
+        - src
+        - tests
+        - scripts
+        - packages/nepdate-patro/src
+        - packages/nepdate-patro/tests
+        - packages/nepdate-patro/scripts
+    treatPhpDocTypesAsCertain: true
+    reportUnmatchedIgnoredErrors: true
+    checkExplicitMixed: true
+    checkImplicitMixed: true
+    checkMissingCallableSignature: true
+    checkBenevolentUnionTypes: true
+    checkTooWideReturnTypesInProtectedAndPublicMethods: true
+    checkUninitializedProperties: true
