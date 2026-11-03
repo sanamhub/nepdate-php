@@ -16,12 +16,15 @@ use PHPUnit\Framework\TestCase;
  */
 final class DatesTest extends TestCase
 {
-    /** @return list<array<string, string>> */
+    /** @return list<array{array<string, string>}> */
     public static function rows(): array
     {
         return Vectors::provider('csharp-golden/dates.tsv');
     }
 
+    /**
+     * @param array<string, string> $row
+     */
     #[DataProvider('rows')]
     public function testRow(array $row): void
     {
@@ -37,7 +40,7 @@ final class DatesTest extends TestCase
         self::assertSame($row['long_en_weekday'], $date->toLongString(weekday: true));
         self::assertSame($row['long_ne'], $date->toLongString(lang: Lang::Ne));
         self::assertSame($row['long_ne_weekday'], $date->toLongString(weekday: true, lang: Lang::Ne));
-        self::assertSame($row['dmy_dash_nopad'], $date->format("d-M-yyyy"));
+        self::assertSame($row['dmy_dash_nopad'], $date->format('d-M-yyyy'));
 
         $fy = $date->fiscalYear();
         if (!Vectors::isError($row['fy_start'])) {

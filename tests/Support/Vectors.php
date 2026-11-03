@@ -14,6 +14,7 @@ final class Vectors
     private const ROOT = __DIR__ . '/../../shared/spec/vectors';
 
     /**
+     * @param non-empty-string $delimiter
      * @return list<array<string, string>> one associative row per data line, keyed by header
      */
     public static function load(string $relativePath, string $delimiter = "\t"): array
@@ -49,6 +50,7 @@ final class Vectors
      * Like {@see load()}, but wraps each row as a single-element data-provider argument list,
      * since PHPUnit otherwise spreads an associative row's values as positional arguments.
      *
+     * @param non-empty-string $delimiter
      * @return list<array{array<string, string>}>
      */
     public static function provider(string $relativePath, string $delimiter = "\t"): array
@@ -56,7 +58,11 @@ final class Vectors
         return array_map(static fn (array $row): array => [$row], self::load($relativePath, $delimiter));
     }
 
-    /** Splits a `;`-separated list column into its items; returns [] for the `none` sentinel. */
+    /**
+     * Splits a `;`-separated list column into its items; returns [] for the `none` sentinel.
+     *
+     * @return list<string>
+     */
     public static function list(string $value): array
     {
         if ($value === 'none' || $value === '') {
@@ -66,7 +72,11 @@ final class Vectors
         return explode(';', $value);
     }
 
-    /** Splits a `start..end` range-notation string into [start, end]. */
+    /**
+     * Splits a `start..end` range-notation string into [start, end].
+     *
+     * @return list<string>
+     */
     public static function range(string $value): array
     {
         return explode('..', $value, 2);

@@ -3,7 +3,10 @@
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
-         cacheDirectory=".phpunit.cache">
+         cacheDirectory=".phpunit.cache"
+         failOnWarning="true"
+         failOnRisky="true"
+         failOnDeprecation="true">
     <testsuites>
         <testsuite name="unit">
             <directory>tests/Unit</directory>
@@ -21,4 +24,9 @@
             <directory>packages/nepdate-patro/src</directory>
         </include>
     </source>
+    <php>
+        <!-- The vector suites keep a few hundred thousand assertions and 109,212 dates in play. -->
+        <ini name="memory_limit" value="512M"/>
+        <ini name="error_reporting" value="-1"/>
+    </php>
 </phpunit>
