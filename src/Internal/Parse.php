@@ -8,7 +8,11 @@ use NepDate\ErrorKind;
 use NepDate\NepDateException;
 
 /**
- * The strict parser of PARSING.md §1: a hand-written scanner, no regex.
+ * The strict parser of PARSING.md §1: a hand-written, allocation-free scanner, no regex.
+ *
+ * The scanner walks bytes. An ASCII byte is a digit or a separator in one comparison, and only a
+ * byte at or above 0x80 costs a character read, which is what `YYYY/MM/DD` (the common input) and
+ * Devanagari digits need.
  *
  * @internal
  */
@@ -16,7 +20,20 @@ final class Parse
 {
     private const int GROUP_COUNT = 3;
     private const int MAX_DIGITS = 4;
-    private const string SEPARATORS = "-/._\\ ।|";
+
+    /** The ASCII separators of PARSING.md §1, by byte: - / . _ \ space | */
+    private const array ASCII_SEPARATORS = [
+        0x2D => true,
+        0x2F => true,
+        0x2E => true,
+        0x5F => true,
+        0x5C => true,
+        0x20 => true,
+        0x7C => true,
+    ];
+
+    /** The multi-byte separators of PARSING.md §1: `।` (U+0964). */
+    private const string MULTI_BYTE_SEPARATORS = '।';
 
     /**
      * @return array{0: int, 1: int, 2: int} the parsed year, month and day
@@ -28,14 +45,29 @@ final class Parse
         $inGroup = false;
         $digits = 0;
 
-        $chars = preg_split('//u', $s, -1, PREG_SPLIT_NO_EMPTY);
-        if ($chars === false) {
-            throw new NepDateException(ErrorKind::InvalidCharacter, 'input is not valid UTF-8');
-        }
+        $index = 0;
+        $length = strlen($s);
+        while ($index < $length) {
+            $ord = ord($s[$index]);
+            $isDigit = $ord >= 0x30 && $ord <= 0x39;
+            $isSeparator = isset(self::ASCII_SEPARATORS[$ord]);
+            $width = 1;
 
-        foreach ($chars as $char) {
-            $value = self::digitValue($char);
-            if ($value >= 0) {
+            if (!$isDigit && !$isSeparator) {
+                $char = Utf8::charAt($s, $index);
+                $width = strlen($char);
+                $value = Utf8::digitValue($char);
+                if ($value >= 0) {
+                    $isDigit = true;
+                    $ord = 0x30 + $value;
+                } elseif (str_contains(self::MULTI_BYTE_SEPARATORS, $char)) {
+                    $isSeparator = true;
+                } else {
+                    throw new NepDateException(ErrorKind::InvalidCharacter, "invalid character '{$char}'");
+                }
+            }
+
+            if ($isDigit) {
                 if (!$inGroup) {
                     if ($count === self::GROUP_COUNT) {
                         throw new NepDateException(ErrorKind::WrongGroupCount, 'more than three groups');
@@ -48,12 +80,13 @@ final class Parse
                 if ($digits > self::MAX_DIGITS) {
                     throw new NepDateException(ErrorKind::NumberTooLong, 'a group has more than 4 digits');
                 }
-                $groups[$count - 1] = $groups[$count - 1] * 10 + $value;
-            } elseif (str_contains(self::SEPARATORS, $char)) {
-                $inGroup = false;
-            } else {
-                throw new NepDateException(ErrorKind::InvalidCharacter, "invalid character '{$char}'");
+                $groups[$count - 1] = $groups[$count - 1] * 10 + ($ord - 0x30);
+                $index += $width;
+                continue;
             }
+
+            $inGroup = false;
+            $index += $width;
         }
 
         if ($count < self::GROUP_COUNT) {
@@ -61,43 +94,5 @@ final class Parse
         }
 
         return [$groups[0], $groups[1], $groups[2]];
-    }
-
-    /** The value of an ASCII or Devanagari digit, or -1 for any other character. */
-    private static function digitValue(string $char): int
-    {
-        $code = self::codepoint($char);
-        if ($code >= 0x30 && $code <= 0x39) {
-            return $code - 0x30;
-        }
-        if ($code >= 0x0966 && $code <= 0x096F) {
-            return $code - 0x0966;
-        }
-
-        return -1;
-    }
-
-    /** Decodes the single UTF-8 character `$char` to its Unicode code point, without ext-mbstring. */
-    private static function codepoint(string $char): int
-    {
-        $len = strlen($char);
-        if ($len === 0) {
-            return -1;
-        }
-        $first = ord($char[0]);
-        if ($len === 1) {
-            return $first;
-        }
-        if ($len === 2) {
-            return (($first & 0x1F) << 6) | (ord($char[1]) & 0x3F);
-        }
-        if ($len === 3) {
-            return (($first & 0x0F) << 12) | ((ord($char[1]) & 0x3F) << 6) | (ord($char[2]) & 0x3F);
-        }
-
-        return (($first & 0x07) << 18)
-            | ((ord($char[1]) & 0x3F) << 12)
-            | ((ord($char[2]) & 0x3F) << 6)
-            | (ord($char[3]) & 0x3F);
     }
 }

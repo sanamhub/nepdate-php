@@ -14,10 +14,21 @@ use NepDate\NepDateException;
  */
 final class Calendar
 {
+    /** @var list<int> January to December of a common Gregorian year. */
+    private const array GREGORIAN_MONTH_LENGTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
     /** The length of BS month `$month` (1-12) of BS year `$year`, 29 through 32. */
     public static function monthLength(int $year, int $month): int
     {
-        $packed = CalendarTable::PACKED[$year - CalendarTable::MIN_YEAR];
+        $index = $year - CalendarTable::MIN_YEAR;
+        if ($index < 0 || $index >= CalendarTable::YEARS) {
+            throw new NepDateException(
+                ErrorKind::OutOfRange,
+                "year {$year} is outside " . CalendarTable::MIN_YEAR . '..' . CalendarTable::MAX_YEAR,
+            );
+        }
+
+        $packed = CalendarTable::PACKED[$index];
 
         return 29 + (($packed >> (2 * ($month - 1))) & 0b11);
     }
@@ -125,12 +136,11 @@ final class Calendar
 
     public static function gregorianMonthLength(int $y, int $m): int
     {
-        static $lengths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
         if ($m === 2 && self::isGregorianLeapYear($y)) {
             return 29;
         }
 
-        return $lengths[$m - 1];
+        return self::GREGORIAN_MONTH_LENGTHS[$m - 1];
     }
 
     public static function isGregorianLeapYear(int $y): bool

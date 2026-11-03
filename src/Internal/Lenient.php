@@ -17,10 +17,22 @@ use NepDate\NepDateException;
  */
 final class Lenient
 {
-    private const string LENIENT_SEPARATORS = "-/\\_ |।,";
+    private const string LENIENT_SEPARATORS = '-/\\_ |।,';
     private const int MAX_DIGITS = 4;
-    private const string DEVA_DIGITS = '०१२३४५६७८९';
-    private const string ASCII_DIGITS = '0123456789';
+
+    /**
+     * Devanagari to ASCII digits. An array, not the two-string form of `strtr()`, which maps
+     * bytes and would corrupt every multi-byte character that shares a byte with a digit.
+     *
+     * @var array<string, string>
+     */
+    private const array DEVA_DIGITS = [
+        '०' => '0', '१' => '1', '२' => '2', '३' => '3', '४' => '4',
+        '५' => '5', '६' => '6', '७' => '7', '८' => '8', '९' => '9',
+    ];
+
+    /** U+212A KELVIN SIGN: the one non-ASCII character that folds to an ASCII letter (PARSING.md §2). */
+    private const string KELVIN = "\u{212A}";
 
     private const array ERA_MARKERS = [
         'bs', 'b.s.', 'b.s', 'vs', 'v.s.', 'v.s',
@@ -62,12 +74,15 @@ final class Lenient
     public static function parse(string $s): array
     {
         try {
-            return Parse::strict($s);
+            $strict = Parse::strict($s);
+            Calendar::validate(...$strict);
+
+            return $strict;
         } catch (NepDateException) {
-            // fall through to the lenient scan
+            // The strict grammar or the date it reads is unusable: fall through to the token scan.
         }
 
-        $normalized = strtr($s, self::DEVA_DIGITS, self::ASCII_DIGITS);
+        $normalized = strtr($s, self::DEVA_DIGITS);
         [$numbers, $digitCounts, $months, $unknown] = self::tokens($normalized);
 
         if ($unknown) {
@@ -87,6 +102,10 @@ final class Lenient
     }
 
     /**
+     * The token scan of PARSING.md §2. Chunks are delimited by whole characters: comparing a
+     * single byte against the separator list would match the lead byte of `।` and split every
+     * Devanagari word.
+     *
      * @return array{0: list<int>, 1: list<int>, 2: list<int>, 3: bool}
      */
     private static function tokens(string $s): array
@@ -99,16 +118,21 @@ final class Lenient
         $index = 0;
         $length = strlen($s);
         while ($index < $length) {
-            if (str_contains(self::LENIENT_SEPARATORS, $s[$index])) {
-                $index++;
+            $char = Utf8::charAt($s, $index);
+            if (str_contains(self::LENIENT_SEPARATORS, $char)) {
+                $index += strlen($char);
                 continue;
             }
-            $end = $index;
-            while ($end < $length && !str_contains(self::LENIENT_SEPARATORS, $s[$end])) {
-                $end++;
+
+            $chunk = '';
+            while ($index < $length) {
+                $char = Utf8::charAt($s, $index);
+                if (str_contains(self::LENIENT_SEPARATORS, $char)) {
+                    break;
+                }
+                $chunk .= $char;
+                $index += strlen($char);
             }
-            $chunk = substr($s, $index, $end - $index);
-            $index = $end;
 
             if (self::isNumeric($chunk)) {
                 $start = 0;
@@ -143,6 +167,7 @@ final class Lenient
         return [$numbers, $digitCounts, $months, $unknown];
     }
 
+
     private static function isNumeric(string $chunk): bool
     {
         if ($chunk === '') {
@@ -161,7 +186,8 @@ final class Lenient
     /** A month number, 0 for a dropped word, or -1 for an unknown word. */
     private static function wordValue(string $token): int
     {
-        $folded = strtolower($token);
+        // Case folding is ASCII plus the Kelvin sign, exactly as PARSING.md §2 defines it.
+        $folded = strtolower(str_replace(self::KELVIN, 'k', $token));
         foreach (self::MONTH_WORDS as [$name, $month]) {
             if ($folded === $name) {
                 return $month;

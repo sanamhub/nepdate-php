@@ -43,9 +43,9 @@ final class Pattern
         while ($index < $length) {
             $char = $pattern[$index];
             if ($char === '\\') {
-                if ($index + 1 < $length) {
-                    $out .= $pattern[$index + 1];
-                }
+                // A trailing backslash has nothing to escape, so it is written literally
+                // (FORMATTING.md §5).
+                $out .= $index + 1 < $length ? $pattern[$index + 1] : '\\';
                 $index += 2;
                 continue;
             }

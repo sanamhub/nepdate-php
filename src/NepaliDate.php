@@ -7,6 +7,7 @@ namespace NepDate;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
+use JsonException;
 use JsonSerializable;
 use NepDate\Internal\Calendar;
 use NepDate\Internal\CalendarTable;
@@ -138,9 +139,23 @@ final class NepaliDate implements Stringable, JsonSerializable
         return $this->year * 10000 + $this->month * 100 + $this->day;
     }
 
+    /**
+     * Reads the JSON form written by {@see jsonSerialize()}: a quoted `YYYY-MM-DD` string
+     * (NC10, D-11). Anything else, including a JSON `null`, is an invalid date.
+     */
     public static function fromJson(string $json): self
     {
-        return self::parse($json);
+        try {
+            $decoded = json_decode($json, flags: JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            throw new NepDateException(ErrorKind::InvalidCharacter, 'the text is not a JSON string');
+        }
+
+        if (!is_string($decoded)) {
+            throw new NepDateException(ErrorKind::InvalidCharacter, 'the JSON value is not a string');
+        }
+
+        return self::parse($decoded);
     }
 
     public function jsonSerialize(): string
