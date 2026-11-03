@@ -27,7 +27,7 @@ parameter forms with explicit outcomes.
    a programming error the caller can avoid by type.
 4. **Every throwing entry point has a `try*` form that returns `null`**: `tryParse`,
    `tryParseLenient`, and `intersect` for the empty-intersection case. This is the PHP reading of
-   `NP03`, `NP08` and `NR19`; there is no `out` parameter in PHP.
+   the C# `TryParse` methods; there is no `out` parameter in PHP.
 5. **A range refuses to be empty.** `NepaliDateRange::of()` throws when the start is after the end,
    and `intersect` returns `null` rather than an empty range (`D-01`, `D-16`).
 
@@ -37,4 +37,4 @@ parameter forms with explicit outcomes.
 - A caller who wants the boolean form writes `NepaliDate::tryParse($text) !== null`; a caller who
   wants the reason catches the exception and reads `kind()`.
 - `NepaliDateRange::count()` is always at least 1, so `Length == 0` and `IsEmpty` have no PHP
-  equivalent (`NR05` is not ported).
+  equivalent.

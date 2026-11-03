@@ -6,10 +6,10 @@
 ## Context
 
 The C# library has four serialization adapters: a `TypeConverter`, a `System.Text.Json` converter, a
-Newtonsoft converter and an XML serializer, each with a string and an object form. `D-11` and
-decision `O-07` cut that down to the language's native hook and the canonical text `YYYY-MM-DD`. The
-`YYYYMMDD` integer stays part of the contract (`NC09`), and a JSON `null` must not become the C#
-zero-value date, because there is no zero value here (`D-01`).
+Newtonsoft converter and an XML serializer, each with a string and an object form. `D-11` cuts that
+down to the language's native hook and the canonical text `YYYY-MM-DD`. The `YYYYMMDD` integer stays
+part of the contract, and a JSON `null` must not become the C# zero-value date, because there is no
+zero value here (`D-01`).
 
 ## Decision
 
@@ -18,11 +18,11 @@ zero-value date, because there is no zero value here (`D-01`).
 2. **`NepaliDate::fromJson(string $json): self` reads that form.** It decodes the JSON text first,
    so the argument is the JSON document (`"\"2081-04-15\""`), not the raw date; anything that is not
    a JSON string, including `null`, is an `ErrorKind::InvalidCharacter` failure.
-3. **`__toString()` stays the default display form** `2081/04/15` (`NF01`), not the serialized form.
+3. **`__toString()` stays the default display form** `2081/04/15`, not the serialized form.
    A date used as a string key and a date written to JSON therefore differ by design, and the docs
    say so.
-4. **The `YYYYMMDD` integer is `toYmd()` and `fromYmd()`** (`NC09`), with no converter type.
-5. **No object form, no XML, no adapter registration.** `NC11` to `NC16` are not ported.
+4. **The `YYYYMMDD` integer is `toYmd()` and `fromYmd()`**, with no converter type.
+5. **No object form, no XML, no adapter registration.** The C# object forms and adapters are not ported.
 
 ## Consequences
 

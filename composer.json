@@ -65,7 +65,7 @@
             "php packages/nepdate-patro/scripts/generate-patro-tables.php --check"
         ],
         "test": "phpunit",
-        "stan": "phpstan analyse",
+        "stan": "phpstan analyse --memory-limit=1G",
         "cs": "php-cs-fixer fix --dry-run --diff",
         "cs:fix": "php-cs-fixer fix",
         "docs:check": "php scripts/docs-check.php",

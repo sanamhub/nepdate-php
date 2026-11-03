@@ -10,7 +10,7 @@ use Stringable;
 
 /**
  * A Nepali fiscal year, Shrawan 1 through the end of Ashad the following BS year
- * (ALGORITHM.md §9, API.md NY01-NY10).
+ * (ALGORITHM.md §9).
  *
  * The value carries the BS year in which it starts, so a date in months 1 to 3 belongs to the
  * fiscal year that started in the previous BS year.

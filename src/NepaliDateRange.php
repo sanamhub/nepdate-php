@@ -23,7 +23,7 @@ final class NepaliDateRange implements IteratorAggregate, Stringable
     ) {
     }
 
-    // --- Construction (NR01-NR06) ---
+    // --- Construction ---
 
     public static function of(NepaliDate $start, NepaliDate $end): self
     {
@@ -80,7 +80,7 @@ final class NepaliDateRange implements IteratorAggregate, Stringable
         return self::forYear(NepaliDate::today($zone)->year());
     }
 
-    // --- Accessors (NR07-NR10) ---
+    // --- Accessors ---
 
     public function start(): NepaliDate
     {
@@ -102,7 +102,7 @@ final class NepaliDateRange implements IteratorAggregate, Stringable
         return $this->start->equals($other->start) && $this->end->equals($other->end);
     }
 
-    // --- Membership and relations (NR11-NR15) ---
+    // --- Membership and relations ---
 
     public function contains(NepaliDate $date): bool
     {
@@ -131,7 +131,7 @@ final class NepaliDateRange implements IteratorAggregate, Stringable
         return $afterThis || $afterOther;
     }
 
-    // --- Set operations (NR16-NR20) ---
+    // --- Set operations ---
 
     public function intersect(self $other): ?self
     {
@@ -171,7 +171,7 @@ final class NepaliDateRange implements IteratorAggregate, Stringable
         return $result;
     }
 
-    // --- Splitting and iteration (NR21-NR26) ---
+    // --- Splitting and iteration ---
 
     /** @return list<self> */
     public function splitByMonth(): array
@@ -261,7 +261,7 @@ final class NepaliDateRange implements IteratorAggregate, Stringable
         return new ArrayIterator($this->datesWithInterval());
     }
 
-    // --- Formatting (NR27-NR30) ---
+    // --- Formatting ---
 
     public function __toString(): string
     {

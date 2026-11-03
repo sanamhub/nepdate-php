@@ -1,4 +1,4 @@
-# One tag vX.Y.Z releases both packages on the hub's lockstep line (ADR-0004 decision 2, ADR-0005).
+# One tag vX.Y.Z releases both packages on the hub's lockstep line (ADR-0004 decision 2, ADR-0007).
 # Packagist reads the repository, so there is no upload: this workflow runs every gate, builds the
 # source archives, attests them and creates the release. A manual dispatch runs the gates and the
 # packaging and never creates anything. The split mirror push needs the `production` environment.
@@ -86,7 +86,7 @@ jobs:
           retention-days: 7
 
   # The patro package lives in packages/nepdate-patro, and Packagist reads one repository per
-  # package, so the package is pushed to a read-only mirror first (ADR-0005).
+  # package, so the package is pushed to a read-only mirror first (ADR-0004).
   split:
     needs: pack
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
@@ -102,17 +102,27 @@ jobs:
           fetch-depth: 0
       - name: Push packages/nepdate-patro to its mirror
         env:
-          MIRROR_TOKEN: ${{ secrets.MIRROR_TOKEN }}
+          MIRROR_DEPLOY_KEY: ${{ secrets.MIRROR_DEPLOY_KEY }}
           VERSION: ${{ needs.pack.outputs.version }}
         run: |
           set -euo pipefail
-          if [ -z "$MIRROR_TOKEN" ]; then
-            echo "::error::the production environment needs a MIRROR_TOKEN secret with write access to sanamhub/nepdate-patro"
+          if [ -z "$MIRROR_DEPLOY_KEY" ]; then
+            echo "::error::the production environment needs a MIRROR_DEPLOY_KEY secret, a deploy key with write access to sanamhub/nepdate-php-patro"
             exit 1
           fi
+          key="$RUNNER_TEMP/mirror_key"
+          hosts="$RUNNER_TEMP/known_hosts"
+          printf '%s\n' "$MIRROR_DEPLOY_KEY" > "$key"
+          chmod 600 "$key"
+          # GitHub's published ed25519 host key, so the push never trusts a key it was just shown.
+          echo 'github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl' > "$hosts"
+          export GIT_SSH_COMMAND="ssh -i $key -o IdentitiesOnly=yes -o UserKnownHostsFile=$hosts -o StrictHostKeyChecking=yes"
           split="$(git subtree split --prefix=packages/nepdate-patro HEAD)"
-          git push --force "https://x-access-token:$MIRROR_TOKEN@github.com/sanamhub/nepdate-patro.git" \
-            "$split:refs/heads/main" "refs/tags/v$VERSION:refs/tags/v$VERSION"
+          # The tag must name the split commit: Packagist reads composer.json at the tag, and the
+          # monorepo commit holds the core's manifest at its root.
+          git push --force git@github.com:sanamhub/nepdate-php-patro.git \
+            "$split:refs/heads/main" "$split:refs/tags/v$VERSION"
+          rm -f "$key"
 
   release:
     needs: [pack, split]

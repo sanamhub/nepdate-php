@@ -12,7 +12,7 @@ does the checks and the packaging; this file is what a human has to do around it
    git push -u origin main
    ```
 
-2. **Create the patro mirror.** `sanamhub/nepdate-patro`, public, empty. It is read-only in practice:
+2. **Create the patro mirror.** `sanamhub/nepdate-php-patro`, public, empty. It is read-only in practice:
    `release.yml` force-pushes the subtree split to it on every tag (ADR-0004).
 3. **Protect `main`.** Require a pull request, require the `ci` checks, require branches to be up to
    date, and disable force pushes.
@@ -21,12 +21,12 @@ does the checks and the packaging; this file is what a human has to do around it
 
    | Secret | What | Why |
    |---|---|---|
-   | `MIRROR_TOKEN` | A fine-grained personal access token with `contents: write` on `sanamhub/nepdate-patro` | The split push to the mirror |
+   | `MIRROR_DEPLOY_KEY` | The private half of an SSH deploy key with write access, added to `sanamhub/nepdate-php-patro` only | The split push to the mirror |
 
    `SYNC_APP_PRIVATE_KEY` and the `SYNC_APP_ID` variable belong to the hub's `shared-sync.yml`
    (optional; without them the PR is opened with `GITHUB_TOKEN`).
 5. **Register both packages on Packagist.** `sanamhub/nepdate` from this repository, and
-   `sanamhub/nepdate-patro` from the mirror. Enable the GitHub webhook Packagist offers, so a tag
+   `sanamhub/nepdate-patro` from the mirror `sanamhub/nepdate-php-patro`. Enable the GitHub webhook Packagist offers, so a tag
    updates both. Create the `published-check` label used by `verify-published.yml`.
 6. **Publish a GitHub release for the tag** only after Packagist serves the version; the workflow
    does it, but the first one needs both packages listed, so confirm the listings first.

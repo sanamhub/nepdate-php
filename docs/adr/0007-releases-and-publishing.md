@@ -20,7 +20,7 @@ subdirectory, which Packagist cannot read (ADR-0004).
    `git archive`, attests them with GitHub build provenance, and creates the GitHub release with the
    changelog's `Unreleased` section as its notes. Packagist picks the tag up through the webhook.
 3. **The patro package reaches Packagist through the split mirror** pushed by the `split` job
-   (ADR-0004), which is the one step that needs a secret (`MIRROR_TOKEN`) and the `production`
+   (ADR-0004), which is the one step that needs a secret (`MIRROR_DEPLOY_KEY`, a deploy key scoped to the mirror) and the `production`
    environment.
 4. **The `production` environment holds the tag rule** `v*` and the secret, so a release needs an
    approval from the owner and cannot be triggered by a branch push.

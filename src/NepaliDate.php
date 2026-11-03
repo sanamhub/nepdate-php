@@ -33,7 +33,7 @@ final class NepaliDate implements Stringable, JsonSerializable
     ) {
     }
 
-    // --- Construction (ND01, ND02, ND04, ND16, ND17, NC01) ---
+    // --- Construction ---
 
     public static function fromBs(int $year, int $month, int $day): self
     {
@@ -89,7 +89,7 @@ final class NepaliDate implements Stringable, JsonSerializable
         return new self($year, $month, $day, $serial);
     }
 
-    // --- Parsing (ND02, NP01, NP03, NC02, NC03) ---
+    // --- Parsing ---
 
     public static function parse(string $text): self
     {
@@ -123,7 +123,7 @@ final class NepaliDate implements Stringable, JsonSerializable
         }
     }
 
-    // --- Serialization (NC09, NC10) ---
+    // --- Serialization ---
 
     public static function fromYmd(int $n): self
     {
@@ -141,7 +141,7 @@ final class NepaliDate implements Stringable, JsonSerializable
 
     /**
      * Reads the JSON form written by {@see jsonSerialize()}: a quoted `YYYY-MM-DD` string
-     * (NC10, D-11). Anything else, including a JSON `null`, is an invalid date.
+     * (D-11). Anything else, including a JSON `null`, is an invalid date.
      */
     public static function fromJson(string $json): self
     {
@@ -163,7 +163,7 @@ final class NepaliDate implements Stringable, JsonSerializable
         return Format::iso($this->year, $this->month, $this->day, Lang::En);
     }
 
-    // --- Batch conversion (NC04-NC08) ---
+    // --- Batch conversion ---
 
     /**
      * @param iterable<DateTimeInterface> $dates
@@ -207,7 +207,7 @@ final class NepaliDate implements Stringable, JsonSerializable
         return $result;
     }
 
-    // --- Accessors (ND06-ND13) ---
+    // --- Accessors ---
 
     public function year(): int
     {
@@ -276,7 +276,7 @@ final class NepaliDate implements Stringable, JsonSerializable
         return [$this->year, $this->month, $this->day];
     }
 
-    // --- Clock-relative (ND21-ND23) ---
+    // --- Clock-relative ---
 
     public function isToday(DateTimeZone $zone): bool
     {
@@ -293,7 +293,7 @@ final class NepaliDate implements Stringable, JsonSerializable
         return $this->equals(self::today($zone)->addDays(1));
     }
 
-    // --- Comparison (ND24, ND26, ND29-ND34) ---
+    // --- Comparison ---
 
     public function compareTo(self $other): int
     {
@@ -305,7 +305,7 @@ final class NepaliDate implements Stringable, JsonSerializable
         return $this->serial === $other->serial;
     }
 
-    // --- Arithmetic (NA01-NA05) ---
+    // --- Arithmetic ---
 
     public function addDays(int $days): self
     {
@@ -389,7 +389,7 @@ final class NepaliDate implements Stringable, JsonSerializable
         );
     }
 
-    // --- Fiscal year (NY01-NY10, dispatched from FiscalYear) ---
+    // --- Fiscal year (dispatched from FiscalYear) ---
 
     public function fiscalYear(): FiscalYear
     {
@@ -406,7 +406,7 @@ final class NepaliDate implements Stringable, JsonSerializable
         };
     }
 
-    // --- Formatting (NF01-NF06) ---
+    // --- Formatting ---
 
     public function __toString(): string
     {

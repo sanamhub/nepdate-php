@@ -18,8 +18,8 @@ read-only mirror repository, or a `path` repository in every consumer, which onl
 1. **Core and patro live in one repository.** `src/` is `NepDate`, `packages/nepdate-patro/src/` is
    `NepDate\Patro`. One `CHANGELOG.md` and one version number cover both.
 2. **Publishing uses a subtree split mirror.** The release workflow splits
-   `packages/nepdate-patro` to its own branch and force-pushes it to `sanamhub/nepdate-patro` with the
-   same tag, so Packagist serves `sanamhub/nepdate-patro` from that mirror and `sanamhub/nepdate` from
+   `packages/nepdate-patro` to its own branch and force-pushes it to `sanamhub/nepdate-php-patro` with the
+   same tag on the split commit, so Packagist serves `sanamhub/nepdate-patro` from that mirror and `sanamhub/nepdate` from
    this repository. The mirror is read-only: nobody commits to it, and the split runs on every tag
    (`release.yml`).
 3. **Development resolves the core package through a `path` repository** in the root

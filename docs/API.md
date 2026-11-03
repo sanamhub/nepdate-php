@@ -21,44 +21,44 @@ Each intentional departure from the C# reference is marked with the `D-xx` row o
 The calendar covers **1901-01-01 to 2199-12-30 BS**, which is 1844-04-11 to 2143-04-15 AD. Month
 lengths come from the BS table, 29 to 32 days, not from a fixed 30 or 31.
 
-## 1. Dates, identity and comparison (`ND01`-`ND34`)
+## 1. Dates, identity and comparison
 
-| ID | PHP item | Notes |
+| C# | PHP | Notes |
 |---|---|---|
-| ND01 | `NepaliDate::fromBs(int $year, int $month, int $day): self` | Validates year, then month, then day. |
-| ND02 | `NepaliDate::parse(string $text): self` | The strict parser, section 5. |
-| ND03 | not ported | `D-05`, `D-06`: no `autoAdjust` heuristics. |
-| ND04 | `NepaliDate::fromGregorian(DateTimeInterface $date): self` | Uses the date part only. |
-| ND05 | not ported | `D-01`: no zero value, so no `IsDefault`. |
-| ND06 | `year(): int` | |
-| ND07 | `month(): int`, `monthEnum(): Month` | |
-| ND08 | `day(): int` | |
-| ND09 | `toDateTime(): DateTimeImmutable` | Midnight, no zone. |
-| ND10 | `weekday(): Weekday` | |
-| ND11 | `dayOfYear(): int` | 1-based in the BS year. |
-| ND12 | `monthLength(): int` | 29 to 32. |
-| ND13 | `monthEnum(): Month` | `Month::label()` and `Month::shortLabel()` name it. |
-| ND14 | `NepaliDate::today(DateTimeZone $zone): self` | The zone is explicit. |
-| ND15 | same as ND14 | `O-02`: a date has no time, so there is no separate `now()`. |
-| ND16 | `NepaliDate::min(): self` | 1901-01-01 BS. |
-| ND17 | `NepaliDate::max(): self` | 2199-12-30 BS. |
-| ND18 | `lastDayOfMonth(): self` | |
-| ND19 | `toArray(): array{int, int, int}` | `[year, month, day]`. |
-| ND20 | `yearLength(): int` | The BS year length, 364 to 367 (`D-12`). |
-| ND21 | `isToday(DateTimeZone $zone): bool` | |
-| ND22 | `isYesterday(DateTimeZone $zone): bool` | |
-| ND23 | `isTomorrow(DateTimeZone $zone): bool` | |
-| ND24 | `compareTo(NepaliDate $other): int` | -1, 0 or 1. |
-| ND25 | not ported | Typed comparison only. |
-| ND26 | `equals(NepaliDate $other): bool` | |
-| ND27 | `equals(NepaliDate $other): bool` | |
-| ND28 | no hash | ND28 in the PHP column: "no hash". |
-| ND29 | `equals` | |
-| ND30 | `!equals` | |
-| ND31 | `compareTo(...) < 0` | |
-| ND32 | `compareTo(...) <= 0` | |
-| ND33 | `compareTo(...) > 0` | |
-| ND34 | `compareTo(...) >= 0` | |
+| `NepaliDate(int yearBs, int monthBs, int dayBs)` | `NepaliDate::fromBs(int $year, int $month, int $day): self` | Validates year, then month, then day. |
+| `NepaliDate(string rawNepaliDate)` | `NepaliDate::parse(string $text): self` | The strict parser, section 5. |
+| `NepaliDate(string rawNepaliDate, bool autoAdjust, bool monthInMiddle = true)` | not ported | `D-05`, `D-06`: no `autoAdjust` heuristics. |
+| `NepaliDate(DateTime engDate)` | `NepaliDate::fromGregorian(DateTimeInterface $date): self` | Uses the date part only. |
+| `bool IsDefault { get; }` | not ported | `D-01`: no zero value, so no `IsDefault`. |
+| `int Year { get; }` | `year(): int` | |
+| `int Month { get; }` | `month(): int`, `monthEnum(): Month` | |
+| `int Day { get; }` | `day(): int` | |
+| `DateTime EnglishDate { get; }` | `toDateTime(): DateTimeImmutable` | Midnight, no zone. |
+| `DayOfWeek DayOfWeek { get; }` | `weekday(): Weekday` | |
+| `int DayOfYear { get; }` | `dayOfYear(): int` | 1-based in the BS year. |
+| `int MonthEndDay { get; }` | `monthLength(): int` | 29 to 32. |
+| `NepaliMonths MonthName { get; }` | `monthEnum(): Month` | `Month::label()` and `Month::shortLabel()` name it. |
+| `static NepaliDate Today { get; }` | `NepaliDate::today(DateTimeZone $zone): self` | The zone is explicit. |
+| `static NepaliDate Now { get; }` | `today(DateTimeZone $zone)` | A date has no time, so there is no separate `now()`. |
+| `static readonly NepaliDate MinValue` | `NepaliDate::min(): self` | 1901-01-01 BS. |
+| `static readonly NepaliDate MaxValue` | `NepaliDate::max(): self` | 2199-12-30 BS. |
+| `NepaliDate MonthEndDate()` | `lastDayOfMonth(): self` | |
+| `void Deconstruct(out int year, out int month, out int day)` | `toArray(): array{int, int, int}` | `[year, month, day]`. |
+| `bool IsLeapYear()` | `yearLength(): int` | The BS year length, 364 to 367 (`D-12`). |
+| `bool IsToday()` | `isToday(DateTimeZone $zone): bool` | |
+| `bool IsYesterday()` | `isYesterday(DateTimeZone $zone): bool` | |
+| `bool IsTomorrow()` | `isTomorrow(DateTimeZone $zone): bool` | |
+| `int CompareTo(NepaliDate obj)` | `compareTo(NepaliDate $other): int` | -1, 0 or 1. |
+| `int CompareTo(object obj)` | not ported | Typed comparison only. |
+| `bool Equals(NepaliDate other)` | `equals(NepaliDate $other): bool` | |
+| `override bool Equals(object obj)` | `equals(NepaliDate $other): bool` | |
+| `override int GetHashCode()` | not ported | PHP values have no hash contract. |
+| `static bool operator ==(NepaliDate, NepaliDate)` | `equals` | |
+| `static bool operator !=(NepaliDate, NepaliDate)` | `!equals` | |
+| `static bool operator <(NepaliDate, NepaliDate)` | `compareTo(...) < 0` | |
+| `static bool operator <=(NepaliDate, NepaliDate)` | `compareTo(...) <= 0` | |
+| `static bool operator >(NepaliDate, NepaliDate)` | `compareTo(...) > 0` | |
+| `static bool operator >=(NepaliDate, NepaliDate)` | `compareTo(...) >= 0` | |
 
 ```php
 $date = NepaliDate::fromBs(2081, 4, 15);
@@ -120,26 +120,26 @@ $today->addDays(1)->isTomorrow($zone); // => true
 NepaliDate::min()->isToday($zone); // => false
 ```
 
-## 2. Conversion and serialization (`NC01`-`NC16`)
+## 2. Conversion and serialization
 
-| ID | PHP item | Notes |
+| C# | PHP | Notes |
 |---|---|---|
-| NC01 | `fromGregorian(DateTimeInterface $date)` | |
-| NC02 | `parseLenient(string $text): self` | |
-| NC03 | `tryParseLenient(string $text): ?self` | `null` on failure. |
-| NC04 | `fromGregorianBatch(iterable $dates): array` | Ordered, `list<NepaliDate>`. |
-| NC05 | `parseBatch(iterable $texts): array` | Ordered, `list<DateTimeImmutable>`. |
-| NC06 | `toGregorianBatch(iterable $dates): array` | Ordered, `list<DateTimeImmutable>`. |
-| NC07 | same as NC04 | One batch function, not two. |
-| NC08 | same as NC06 | One batch function, not two. |
-| NC09 | `fromYmd(int $n): self`, `toYmd(): int` | The packed `YYYYMMDD` integer. |
-| NC10 | `jsonSerialize(): string`, `fromJson(string $json): self` | `D-11`: a quoted `YYYY-MM-DD` string. |
-| NC11 | not ported | `D-11`: no object form. |
-| NC12 | not ported | `D-11`. |
-| NC13 | not ported | `D-11`. |
-| NC14 | not ported | `D-11`: no XML form. |
-| NC15 | not ported | `D-11`. |
-| NC16 | not ported | `D-11`. |
+| `static NepaliDate DateTimeExtensions.ToNepaliDate(this DateTime englishDate)` | `fromGregorian(DateTimeInterface $date)` | |
+| `static NepaliDate SmartParsingExtensions.ToNepaliDate(this string input)` | `parseLenient(string $text): self` | |
+| `static bool SmartParsingExtensions.TryToNepaliDate(this string input, out NepaliDate result)` | `tryParseLenient(string $text): ?self` | `null` on failure. |
+| `static IEnumerable<NepaliDate> NepaliDate.BulkConvert.ToNepaliDates(IEnumerable<DateTime> engDates, bool useParallel = true)` | `fromGregorianBatch(iterable $dates): array` | Ordered, `list<NepaliDate>`. |
+| `static IEnumerable<DateTime> ...ToEnglishDates(IEnumerable<string> nepDates, bool useParallel = true)` | `parseBatch(iterable $texts): array` | Ordered, `list<DateTimeImmutable>`. |
+| `static IEnumerable<DateTime> ...ToEnglishDates(IEnumerable<NepaliDate> nepDates, bool useParallel = true)` | `toGregorianBatch(iterable $dates): array` | Ordered, `list<DateTimeImmutable>`. |
+| `static IEnumerable<NepaliDate> ...BatchProcessToNepaliDates(IEnumerable<DateTime> engDates, int batchSize = 1000)` | `fromGregorianBatch` | One batch function, not two. |
+| `static IEnumerable<DateTime> ...BatchProcessToEnglishDates(IEnumerable<NepaliDate> nepDates, int batchSize = 1000)` | `toGregorianBatch` | One batch function, not two. |
+| `sealed class NepaliDateTypeConverter : TypeConverter` | `fromYmd(int $n): self`, `toYmd(): int` | The packed `YYYYMMDD` integer. |
+| `class SystemTextJsonConverters.NepaliDateJsonConverter : JsonConverter<NepaliDate>` | `jsonSerialize(): string`, `fromJson(string $json): self` | `D-11`: a quoted `YYYY-MM-DD` string. |
+| `class SystemTextJsonConverters.NepaliDateObjectJsonConverter` | not ported | `D-11`: no object form. |
+| `class NewtonsoftJsonConverters.NepaliDateJsonConverter : JsonConverter<NepaliDate>` | not ported | `D-11`. |
+| `class NewtonsoftJsonConverters.NepaliDateObjectJsonConverter` | not ported | `D-11`. |
+| `class NepaliDateXmlSerializer : IXmlSerializable` | not ported | `D-11`: no XML form. |
+| `static JsonSerializerOptions SerializationExtensions.ConfigureForNepaliDate(this JsonSerializerOptions options, bool useObjectFormat = false)` | not ported | `D-11`. |
+| `static JsonSerializerSettings SerializationExtensions.ConfigureForNepaliDate(this JsonSerializerSettings settings, bool useObjectFormat = false)` | not ported | `D-11`. |
 
 ```php
 NepaliDate::fromGregorian(new DateTimeImmutable('2024-07-30 23:59:59'))->isoformat(); // => '2081-04-15'
@@ -176,15 +176,15 @@ array_map(static fn (DateTimeImmutable $d): string => $d->format('Y-m-d'), Nepal
 NepaliDate::fromGregorianBatch([]); // => []
 ```
 
-## 3. Arithmetic (`NA01`-`NA05`)
+## 3. Arithmetic
 
-| ID | PHP item | Notes |
+| C# | PHP | Notes |
 |---|---|---|
-| NA01 | `addMonths(int $months, MonthOverflow $overflow = MonthOverflow::Clamp): self` | Whole months; `D-02`. |
-| NA02 | `addDays(int $days): self` | Whole days; `D-03`. |
-| NA03 | `addYears(int $years, MonthOverflow $overflow = MonthOverflow::Clamp): self` | Same modes. |
-| NA04 | `daysUntil(NepaliDate $other): int`, `diff(NepaliDate $other): DateDiff` | `other - this`; `D-07`. |
-| NA05 | no operator | The PHP column: "no operator; use `daysUntil`". |
+| `NepaliDate AddMonths(double months, bool awayFromMonthEnd = false)` | `addMonths(int $months, MonthOverflow $overflow = MonthOverflow::Clamp): self` | Whole months; `D-02`. |
+| `NepaliDate AddDays(double days)` | `addDays(int $days): self` | Whole days; `D-03`. |
+| `NepaliDate AddYears(int years, bool awayFromMonthEnd = false)` | `addYears(int $years, MonthOverflow $overflow = MonthOverflow::Clamp): self` | Same modes. |
+| `TimeSpan Subtract(NepaliDate nepDateTo)` | `daysUntil(NepaliDate $other): int`, `diff(NepaliDate $other): DateDiff` | `other - this`; `D-07`. |
+| `static TimeSpan operator -(NepaliDate d1, NepaliDate d2)` | no operator | The PHP column: "no operator; use `daysUntil`". |
 
 ```php
 $date = NepaliDate::fromBs(2081, 4, 32);
@@ -227,20 +227,20 @@ NepaliDate::max()->addDays(1); // => throws NepDateException(OutOfRange)
 NepaliDate::max()->addMonths(1); // => throws NepDateException(OutOfRange)
 ```
 
-## 4. Formatting (`NF01`-`NF10`)
+## 4. Formatting
 
-| ID | PHP item | Notes |
+| C# | PHP | Notes |
 |---|---|---|
-| NF01 | `__toString(): string` | `YYYY/MM/DD`, ASCII digits. |
-| NF02 | `toShortString(DateOrder $order = Ymd, Separator $separator = Slash, bool $pad = true, Lang $lang = En): string` | |
-| NF03 | `toLongString(bool $weekday = false, bool $year = true, bool $pad = true, Lang $lang = En): string` | |
-| NF04 | `toShortString(..., Lang::Ne)` | |
-| NF05 | `toLongString(..., Lang::Ne)` | |
-| NF06 | `format(string $pattern, Lang $lang = En): string` | |
-| NF07 | not ported | The PHP column: "none; string return". A string is never too short. |
-| NF08 | `DateOrder` enum | `Ymd`, `Ydm`, `Myd`, `Mdy`, `Dym`, `Dmy`. |
-| NF09 | `Separator` enum | `Slash`, `Backslash`, `Dot`, `Underscore`, `Dash`, `Space`. |
-| NF10 | `Month` enum | `Baishakh` (1) to `Chaitra` (12). |
+| `override string ToString()` | `__toString(): string` | `YYYY/MM/DD`, ASCII digits. |
+| `string ToString(DateFormats dateFormat, Separators separator = Separators.ForwardSlash, bool leadingZeros = true)` | `toShortString(DateOrder $order = Ymd, Separator $separator = Slash, bool $pad = true, Lang $lang = En): string` | |
+| `string ToLongDateString(bool leadingZeros = true, bool displayDayName = false, bool displayYear = true)` | `toLongString(bool $weekday = false, bool $year = true, bool $pad = true, Lang $lang = En): string` | |
+| `string ToUnicodeString(DateFormats dateFormat = DateFormats.YearMonthDay, Separators separator = Separators.ForwardSlash, bool leadingZeros = true)` | `toShortString(..., Lang::Ne)` | |
+| `string ToLongDateUnicodeString(bool leadingZeros = true, bool displayDayName = false, bool displayYear = true)` | `toLongString(..., Lang::Ne)` | |
+| `string ToString(string format, IFormatProvider formatProvider = null)` | `format(string $pattern, Lang $lang = En): string` | |
+| `bool ISpanFormattable.TryFormat(Span<char>, out int, ReadOnlySpan<char>, IFormatProvider)` | not ported | The PHP column: "none; string return". A string is never too short. |
+| `enum DateFormats` | `DateOrder` enum | `Ymd`, `Ydm`, `Myd`, `Mdy`, `Dym`, `Dmy`. |
+| `enum Separators` | `Separator` enum | `Slash`, `Backslash`, `Dot`, `Underscore`, `Dash`, `Space`. |
+| `enum NepaliMonths` | `Month` enum | `Baishakh` (1) to `Chaitra` (12). |
 
 ```php
 $date = NepaliDate::fromBs(2081, 4, 15);
@@ -264,7 +264,7 @@ $date->toLongString(lang: Lang::Ne); // => 'साउन १५, २०८१'
 $date->toLongString(weekday: true, lang: Lang::Ne); // => 'मङ्गलवार, साउन १५, २०८१'
 ```
 
-Patterns (`NF06`): `yyyy` and longer runs write four digits, `y` to `yyy` write two, `MMMM` the
+Patterns: `yyyy` and longer runs write four digits, `y` to `yyy` write two, `MMMM` the
 full name, `MMM` the short name, `MM` and `M` the number, `dd` two digits and any other run of `d`
 the number. A backslash escapes the next character, text in single quotes is literal, and a
 standard pattern left alone selects the default, the long form or the ISO form.
@@ -309,19 +309,19 @@ NepaliDate::fromBs(2199, 12, 30)->isoformat(); // => '2199-12-30'
 NepaliDate::fromBs(1901, 1, 1)->toShortString(lang: Lang::Ne); // => '१९०१/०१/०१'
 ```
 
-## 5. Parsing (`NP01`-`NP09`)
+## 5. Parsing
 
-| ID | PHP item | Notes |
+| C# | PHP | Notes |
 |---|---|---|
-| NP01 | `NepaliDate::parse(string $text): self` | Strict. |
-| NP02 | not ported | `D-05`, `D-06`. |
-| NP03 | `NepaliDate::tryParse(string $text): ?self` | `null` on failure. |
-| NP04 | not ported | `D-05`, `D-06`. |
-| NP05 | `parse` | `IParsable` has no PHP equivalent; the method is the interface. |
-| NP06 | `parse` | No span type. |
-| NP07 | `NepaliDate::parseLenient(string $text): self` | |
-| NP08 | `NepaliDate::tryParseLenient(string $text): ?self` | |
-| NP09 | `NepDateException` with `kind(): ErrorKind` | |
+| `static NepaliDate Parse(string rawNepaliDate)` | `NepaliDate::parse(string $text): self` | Strict. |
+| `static NepaliDate Parse(string rawNepaliDate, bool autoAdjust, bool monthInMiddle = true)` | not ported | `D-05`, `D-06`. |
+| `static bool TryParse(string rawNepDate, out NepaliDate result)` | `NepaliDate::tryParse(string $text): ?self` | `null` on failure. |
+| `static bool TryParse(string rawNepDate, out NepaliDate result, bool autoAdjust, bool monthInMiddle = true)` | not ported | `D-05`, `D-06`. |
+| `static NepaliDate IParsable<NepaliDate>.Parse(string, IFormatProvider)` and `TryParse` | `parse` | `IParsable` has no PHP equivalent; the method is the interface. |
+| `static NepaliDate ISpanParsable<NepaliDate>.Parse(ReadOnlySpan<char>, IFormatProvider)` and `TryParse` | `parse` | No span type. |
+| `static NepaliDate SmartDateParser.Parse(string input)` | `NepaliDate::parseLenient(string $text): self` | |
+| `static bool SmartDateParser.TryParse(string input, out NepaliDate result)` | `NepaliDate::tryParseLenient(string $text): ?self` | |
+| `sealed class InvalidNepaliDateFormatException : FormatException` | `NepDateException` with `kind(): ErrorKind` | |
 
 The strict parser takes year, month and day in that order. Separators are `- / . _ \ space | ।`,
 leading, trailing and repeated separators are ignored, and Devanagari digits are accepted (`D-05`).
@@ -365,40 +365,40 @@ NepaliDate::tryParseLenient('80/05/15'); // => null
 NepaliDate::tryParseLenient('Shrawan Bhadra 2080'); // => null
 ```
 
-## 6. Ranges (`NR01`-`NR30`)
+## 6. Ranges
 
-| ID | PHP item | Notes |
+| C# | PHP | Notes |
 |---|---|---|
-| NR01 | `NepaliDateRange` | Inclusive, never empty, `IteratorAggregate`. |
-| NR02 | `NepaliDateRange::of(NepaliDate $start, NepaliDate $end): self` | Refuses a start after the end (`D-01`). |
-| NR03 | `start(): NepaliDate` | |
-| NR04 | `end(): NepaliDate` | |
-| NR05 | not exposed | `D-01`: ranges are never empty. |
-| NR06 | `count(): int` | Inclusive number of days. |
-| NR07 | `singleDay(NepaliDate $day): self` | |
-| NR08 | `fromDayCount(NepaliDate $start, int $days): self` | |
-| NR09 | `forMonth(int $year, int $month): self` | |
-| NR10 | `(new FiscalYear($fy))->range()` | `D-08`. |
-| NR11 | `forYear(int $year): self` | |
-| NR12 | `currentMonth(DateTimeZone $zone): self` | |
-| NR13 | `currentFiscalYear(DateTimeZone $zone): self` | |
-| NR14 | `currentCalendarYear(DateTimeZone $zone): self` | |
-| NR15 | `contains(NepaliDate $date): bool` | |
-| NR16 | `containsRange(NepaliDateRange $other): bool` | |
-| NR17 | `overlaps(NepaliDateRange $other): bool` | |
-| NR18 | `isAdjacentTo(NepaliDateRange $other): bool` | `D-16`. |
-| NR19 | `intersect(NepaliDateRange $other): ?self` | `null` when disjoint; `D-01`, `D-16`. |
-| NR20 | `union(NepaliDateRange $other): self` | The smallest covering range. |
-| NR21 | `except(NepaliDateRange $other): array` | Zero, one or two ranges. |
-| NR22 | `splitByMonth(): array` | `D-16`. |
-| NR23 | `splitByFiscalQuarter(): array` | `D-16`. |
-| NR24 | `datesWithInterval(int $step = 1): array` | `D-16`. |
-| NR25 | `workingDays(bool $excludeSunday = false): array` | `D-16`. |
-| NR26 | `weekendDays(bool $includeSunday = true): array` | `D-16`. |
-| NR27 | `getIterator(): Traversable` | Every day, start to end. |
-| NR28 | `__toString(): string` | `start - end`. |
-| NR29 | `toStringWith(DateOrder $order = Ymd, Separator $separator = Slash, Lang $lang = En): string` | `D-15`. |
-| NR30 | `equals(NepaliDateRange $other): bool` | Value equality of the bounds. |
+| `readonly struct NepaliDateRange : IEnumerable<NepaliDate>, IEquatable<NepaliDateRange>` | `NepaliDateRange` | Inclusive, never empty, `IteratorAggregate`. |
+| `NepaliDateRange(NepaliDate start, NepaliDate end)` | `NepaliDateRange::of(NepaliDate $start, NepaliDate $end): self` | Refuses a start after the end (`D-01`). |
+| `NepaliDate Start { get; }` | `start(): NepaliDate` | |
+| `NepaliDate End { get; }` | `end(): NepaliDate` | |
+| `bool IsEmpty { get; }` | not exposed | `D-01`: ranges are never empty. |
+| `int Length { get; }` | `count(): int` | Inclusive number of days. |
+| `static NepaliDateRange SingleDay(NepaliDate date)` | `singleDay(NepaliDate $day): self` | |
+| `static NepaliDateRange FromDayCount(NepaliDate start, int days)` | `fromDayCount(NepaliDate $start, int $days): self` | |
+| `static NepaliDateRange ForMonth(int year, int month)` | `forMonth(int $year, int $month): self` | |
+| `static NepaliDateRange ForFiscalYear(int fiscalYear)` | `(new FiscalYear($fy))->range()` | `D-08`. |
+| `static NepaliDateRange ForCalendarYear(int year)` | `forYear(int $year): self` | |
+| `static NepaliDateRange CurrentMonth()` | `currentMonth(DateTimeZone $zone): self` | |
+| `static NepaliDateRange CurrentFiscalYear()` | `currentFiscalYear(DateTimeZone $zone): self` | |
+| `static NepaliDateRange CurrentCalendarYear()` | `currentCalendarYear(DateTimeZone $zone): self` | |
+| `bool Contains(NepaliDate date)` | `contains(NepaliDate $date): bool` | |
+| `bool Contains(NepaliDateRange other)` | `containsRange(NepaliDateRange $other): bool` | |
+| `bool Overlaps(NepaliDateRange other)` | `overlaps(NepaliDateRange $other): bool` | |
+| `bool IsAdjacentTo(NepaliDateRange other)` | `isAdjacentTo(NepaliDateRange $other): bool` | `D-16`. |
+| `NepaliDateRange Intersect(NepaliDateRange other)` | `intersect(NepaliDateRange $other): ?self` | `null` when disjoint; `D-01`, `D-16`. |
+| `NepaliDateRange Union(NepaliDateRange other)` | `union(NepaliDateRange $other): self` | The smallest covering range. |
+| `NepaliDateRange[] Except(NepaliDateRange other)` | `except(NepaliDateRange $other): array` | Zero, one or two ranges. |
+| `NepaliDateRange[] SplitByMonth()` | `splitByMonth(): array` | `D-16`. |
+| `NepaliDateRange[] SplitByFiscalQuarter()` | `splitByFiscalQuarter(): array` | `D-16`. |
+| `IEnumerable<NepaliDate> DatesWithInterval(int interval)` | `datesWithInterval(int $step = 1): array` | `D-16`. |
+| `IEnumerable<NepaliDate> WorkingDays(bool excludeSunday = false)` | `workingDays(bool $excludeSunday = false): array` | `D-16`. |
+| `IEnumerable<NepaliDate> WeekendDays(bool includeSunday = true)` | `weekendDays(bool $includeSunday = true): array` | `D-16`. |
+| `IEnumerator<NepaliDate> GetEnumerator()` | `getIterator(): Traversable` | Every day, start to end. |
+| `override string ToString()` | `__toString(): string` | `start - end`. |
+| `string ToString(DateFormats format, Separators separator = Separators.ForwardSlash)` | `toStringWith(DateOrder $order = Ymd, Separator $separator = Slash, Lang $lang = En): string` | `D-15`. |
+| `Equals`, `GetHashCode`, `operator ==`, `operator !=` | `equals(NepaliDateRange $other): bool` | Value equality of the bounds. |
 
 ```php
 $range = NepaliDateRange::of(NepaliDate::fromBs(2081, 4, 10), NepaliDate::fromBs(2081, 4, 20));
@@ -480,23 +480,23 @@ count($tail->splitByMonth()); // => 1
 $tail->isAdjacentTo(NepaliDateRange::singleDay(NepaliDate::fromBs(2081, 4, 10))); // => false
 ```
 
-## 7. Fiscal year (`NY01`-`NY13`)
+## 7. Fiscal year
 
-| ID | PHP item | Notes |
+| C# | PHP | Notes |
 |---|---|---|
-| NY01 | `Quarter` enum | `Q1` to `Q4`. |
-| NY02 | `FiscalYear::containing($date)->start()` | `D-08` replaces the instance offsets. |
-| NY03 | `->end()` | |
-| NY04 | `->range()` | |
-| NY05 | `->quarterRange(Quarter $quarter)->start()` | |
-| NY06 | `->quarterRange($quarter)->end()` | |
-| NY07 | `->quarterRange($quarter)` | |
-| NY08 | `(new FiscalYear($fy))->start()` | |
-| NY09 | `(new FiscalYear($fy))->end()` | |
-| NY10 | `(new FiscalYear($fy))->range()` | |
-| NY11 | not ported | `D-08`: the fiscal-year value covers it. |
-| NY12 | not ported | `D-08`. |
-| NY13 | not ported | `D-08`. |
+| `enum FiscalYearQuarters` | `Quarter` enum | `Q1` to `Q4`. |
+| `NepaliDate FiscalYearStartDate(int yearOffset = 0)` | `FiscalYear::containing($date)->start()` | `D-08` replaces the instance offsets. |
+| `NepaliDate FiscalYearEndDate(int yearOffset = 0)` | `->end()` | |
+| `(NepaliDate startDate, NepaliDate endDate) FiscalYearStartAndEndDate(int yearOffset = 0)` | `->range()` | |
+| `NepaliDate FiscalYearQuarterStartDate(FiscalYearQuarters q = Current, int yearOffset = 0)` | `->quarterRange(Quarter $quarter)->start()` | |
+| `NepaliDate FiscalYearQuarterEndDate(FiscalYearQuarters q = Current, int yearOffset = 0)` | `->quarterRange($quarter)->end()` | |
+| `(NepaliDate startDate, NepaliDate endDate) FiscalYearQuarterStartAndEndDate(FiscalYearQuarters q = Current, int yearOffset = 0)` | `->quarterRange($quarter)` | |
+| `static NepaliDate GetFiscalYearStartDate(int fiscalYear)` | `(new FiscalYear($fy))->start()` | |
+| `static NepaliDate GetFiscalYearEndDate(int fiscalYear)` | `(new FiscalYear($fy))->end()` | |
+| `static (NepaliDate, NepaliDate) GetFiscalYearStartAndEndDate(int fiscalYear)` | `(new FiscalYear($fy))->range()` | |
+| `static NepaliDate GetFiscalYearQuarterStartDate(int fiscalYear, int month)` | not ported | `D-08`: the fiscal-year value covers it. |
+| `static NepaliDate GetFiscalYearQuarterEndDate(int fiscalYear, int month)` | not ported | `D-08`. |
+| `static (NepaliDate, NepaliDate) GetFiscalYearQuarterStartAndEndDate(int fiscalYear, int month)` | not ported | `D-08`. |
 
 A fiscal year starts on 1 Shrawan and ends on the last day of Ashad of the next BS year. For a date
 in months 1 to 3 the containing fiscal year started in the previous BS year.
@@ -541,20 +541,20 @@ NepaliDate::fromBs(2081, 10, 1)->quarter(); // => Quarter::Q3
 NepaliDate::fromBs(2081, 1, 1)->quarter(); // => Quarter::Q4
 ```
 
-## 8. Patro (`NT01`-`NT07`)
+## 8. Patro
 
 The patro lives in `sanamhub/nepdate-patro`, namespace `NepDate\Patro`, and depends on the core
 package. `D-13` keeps it out of core: the core package has no tithi, holiday or event data.
 
-| ID | PHP item | Notes |
+| C# | PHP | Notes |
 |---|---|---|
-| NT01 | `CalendarInfo` | Immutable snapshot. |
-| NT02 | `info($date)->tithi()?->name(Lang::Ne)` | `null` outside the tithi data. |
-| NT03 | `info($date)->tithi()?->name(Lang::En)` | |
-| NT04 | `info($date)->isPublicHoliday()` | |
-| NT05 | `info($date)->events()` with `name(Lang::Ne)` | File order, empty array when none. |
-| NT06 | `info($date)->events()` with `name(Lang::En)` | |
-| NT07 | `info(NepaliDate $date): CalendarInfo` | A free function. |
+| `readonly struct CalendarInfo` | `CalendarInfo` | Immutable snapshot. |
+| `string TithiNp { get; }` | `info($date)->tithi()?->name(Lang::Ne)` | `null` outside the tithi data. |
+| `string TithiEn { get; }` | `info($date)->tithi()?->name(Lang::En)` | |
+| `bool IsPublicHoliday { get; }` | `info($date)->isPublicHoliday()` | |
+| `string[] EventsNp { get; }` | `info($date)->events()` with `name(Lang::Ne)` | File order, empty array when none. |
+| `string[] EventsEn { get; }` | `info($date)->events()` with `name(Lang::En)` | |
+| `CalendarInfo GetCalendarInfo()` | `info(NepaliDate $date): CalendarInfo` | A free function. |
 
 `info()` never fails: a date without data returns a `null` tithi, `false` and an empty list.
 
@@ -610,20 +610,20 @@ ErrorKind::InvalidDay->value; // => 'invalid_day'
 
 ## Rows that are not ported
 
-`shared/spec/API.md` marks these rows as outside the port surface, and each keeps its reason:
+`shared/spec/API.md` keeps these C# members outside the port surface, and each keeps its reason:
 
-| Rows | Why |
+| C# | Why |
 |---|---|
-| `ND03`, `NP02`, `NP04` | `D-05`, `D-06`: the `autoAdjust` overloads are replaced by the strict and the lenient parser. |
-| `ND05` | `D-01`: a PHP value cannot be an invalid date, so there is no zero value and no `IsDefault`. |
-| `ND25`, `ND27`, `ND28` | The language has typed comparison and no hash requirement (the PHP column says "no hash"). |
-| `NC11`-`NC16` | `D-11`: no object JSON form, no Newtonsoft or XML adapter, no converter type. |
-| `NF07` | The PHP column: "none; string return"; a PHP string is never too short. |
-| `NY11`-`NY13` | `D-08`: the fiscal-year value covers the static `(year, month)` helpers. |
-| `NR05` | `D-01`: ranges are never empty. |
+| The `autoAdjust` constructor and parse overloads | `D-05`, `D-06`: replaced by the strict and the lenient parser. |
+| `IsDefault` | `D-01`: a PHP value cannot be an invalid date, so there is no zero value. |
+| `CompareTo(object)`, `GetHashCode()` | The language has typed comparison and no hash contract. |
+| The object JSON form, the Newtonsoft and XML adapters, the configuration helpers | `D-11`: the native hook and the `YYYYMMDD` integer only. |
+| `TryFormat` | A PHP string is never too short, so formatting returns a string. |
+| The static `(year, month)` fiscal quarter helpers | `D-08`: the fiscal-year value covers them. |
+| `IsEmpty` | `D-01`: ranges are never empty. |
 
-`NA05` exists as a rule rather than a member: PHP has no operator overloading, so `daysUntil` is
-the only day difference, and its direction is `other - this` (`D-07`).
+The C# `-` operator has no PHP member: PHP has no operator overloading, so `daysUntil` is the only
+day difference, and its direction is `other - this` (`D-07`).
 
 ## Conventions
 

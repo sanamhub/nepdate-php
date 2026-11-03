@@ -85,14 +85,3 @@ Both libraries carry BS 2062 Baishakh = 30 / Jestha = 32 where `shared/data` has
 2087 Paush = 29 where `shared/data` has 30. The first pair keeps the same 62-day total, so it does
 not move a date; the second pair moves every date from BS 2087-09-30 on by one day, which is why
 2088-01-04 and 2089-06-10 disagree.
-
-Two candidates are shown to convert incorrectly on a month boundary, and are listed here as a
-warning, not as comparisons:
-
-- **`shankhadev/bsdate`** and **`fivedots/nepalicalendar`** hard-code BS 2081 as
-  `[31, 31, 32, 32, 31, 30, 30, 30, 29, 30, 30, 30]` where the shared table is
-  `[31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31]`. Both convert from the epoch BS 2000-01-01 =
-  AD 1943-04-14, so BS 2081-03-01 is their 63rd day of the year against the 64th on the shared
-  calendar: they answer AD 2024-06-14 where `shared/spec/vectors/month-boundaries.csv` records
-  2024-06-15, and they reject or overflow BS 2081-02-32. Their BS 2081-04-15 is still right, which is
-  why the defect survives: it is visible only at the month boundaries of BS 2081.
