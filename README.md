@@ -28,7 +28,7 @@ live in the hub [`sanamhub/nepdate`](https://github.com/sanamhub/nepdate); the C
 - Pure PHP 8.3, no extension, no runtime dependency and no runtime data file.
 - BS 1901-01-01 to 2199-12-30 (AD 1844-04-11 to 2143-04-15). A date is always a real day of the
   calendar; there is no invalid or default date. Same results as C# NepDate and the other ports,
-  proved by the shared vectors.
+  checked against the shared vectors.
 - Framework-agnostic: Laravel, Symfony and plain PHP need no bridge and no service provider.
 
 ## Install
