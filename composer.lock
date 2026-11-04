@@ -3118,7 +3118,7 @@
         },
         {
             "name": "sanamhub/nepdate-patro",
-            "version": "0.2.0-rc.1",
+            "version": "1.0.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/nepdate-patro",
@@ -3126,7 +3126,7 @@
             },
             "require": {
                 "php": "^8.3",
-                "sanamhub/nepdate": "^0.2.0-rc.1"
+                "sanamhub/nepdate": "^1.0.0-rc.1"
             },
             "type": "library",
             "autoload": {
