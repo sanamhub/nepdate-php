@@ -7,6 +7,12 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.0-rc.1] - 2026-11-04
+
+### Changed
+
+- The API is stable from 1.0 (hub ADR-0009). No code change in these packages; released with the family on the 1.0 line.
+
 ## [0.2.0-rc.1] - 2026-11-03
 
 ### Added

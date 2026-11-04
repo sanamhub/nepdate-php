@@ -3,7 +3,7 @@
     "description": "Bikram Sambat (Nepali) dates for PHP: conversion, arithmetic, formatting, parsing and ranges, ported from the C# NepDate reference implementation.",
     "type": "library",
     "license": "MIT",
-    "version": "0.2.0-rc.1",
+    "version": "1.0.0-rc.1",
     "homepage": "https://github.com/sanamhub/nepdate-php",
     "keywords": [
         "nepali-date",

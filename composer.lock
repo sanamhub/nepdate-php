@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "70fe5720467604e010b837ab5a97d749",
+    "content-hash": "8c23204d8dcd04b4a3376404770e0bfa",
     "packages": [],
     "packages-dev": [
         {
@@ -3118,15 +3118,15 @@
         },
         {
             "name": "sanamhub/nepdate-patro",
-            "version": "0.2.0-rc.1",
+            "version": "1.0.0-rc.1",
             "dist": {
                 "type": "path",
                 "url": "packages/nepdate-patro",
-                "reference": "a465321671313c5f9425517e8c15e627bb5e5960"
+                "reference": "d75840e5fc51a8c0a6f2903856669e176e26c5ff"
             },
             "require": {
                 "php": "^8.3",
-                "sanamhub/nepdate": "^0.2.0-rc.1"
+                "sanamhub/nepdate": "^1.0.0-rc.1"
             },
             "type": "library",
             "autoload": {
