@@ -29,7 +29,7 @@ The package depends on `sanamhub/nepdate`, so the core arrives with it. While on
 candidate exists, ask for it explicitly:
 
 ```sh
-composer require "sanamhub/nepdate:^0.2@rc" "sanamhub/nepdate-patro:^0.2@rc"
+composer require "sanamhub/nepdate:^1.0@rc" "sanamhub/nepdate-patro:^1.0@rc"
 ```
 
 ## Example
