@@ -1,0 +1,19 @@
+| ID | Operation | Unit | ns/op | sd | bytes/op |
+|---|---|---|---:|---:|---|
+| B1 | BS to AD (fromBs, then toDateTime) | core | 986.2 | 31.3 | not measured |
+| B2 | AD to BS (fromGregorian) | core | 784.6 | 197.8 | not measured |
+| B3 | add 1000 days | core | 935.4 | 253.0 | not measured |
+| B4 | add 13 months, Clamp | core | 726.1 | 74.6 | not measured |
+| B5 | long format, Nepali, with weekday | core | 553.5 | 4.2 | not measured |
+| B6 | strict parse of YYYY/MM/DD | core | 962.7 | 9.3 | not measured |
+| B7 | patro info (tithi, holiday, events) | patro | 322.9 | 5.4 | not measured |
+| B8 | patro month grid (every day of the month) | patro | 20888 | 3224 | not measured |
+
+PHP 8.3.36, 20 measured iterations over 64 inputs.
+
+| Competitor | Operation | ns/op | inputs it answers | agrees with the shared data |
+|---|---|---:|---:|---|
+| anuzpandey/laravel-nepali-date 3.3.0 | BS to AD | 1516771 | 62 | 60 of 64 (62 accepted) |
+| anuzpandey/laravel-nepali-date 3.3.0 | AD to BS (text) | 1534718 | 62 | 60 of 64 (62 accepted) |
+| ernilambar/nepali-date 1.0.9 | BS to AD | 3661036 | 62 | 60 of 64 (62 accepted) |
+| ernilambar/nepali-date 1.0.9 | AD to BS (text) | 3178989 | 62 | 60 of 64 (62 accepted) |
