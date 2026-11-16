@@ -7,8 +7,8 @@
             "label": "BS to AD (fromBs, then toDateTime)",
             "unit": "core",
             "measurement": {
-                "mean": 1456.484375,
-                "stddev": 156.7634337781674,
+                "mean": 986.171875,
+                "stddev": 31.286209490714516,
                 "iterations": 20,
                 "count": 64
             }
@@ -17,8 +17,8 @@
             "label": "AD to BS (fromGregorian)",
             "unit": "core",
             "measurement": {
-                "mean": 2427.1875,
-                "stddev": 103.21066517686047,
+                "mean": 784.609375,
+                "stddev": 197.77773872594173,
                 "iterations": 20,
                 "count": 64
             }
@@ -27,8 +27,8 @@
             "label": "add 1000 days",
             "unit": "core",
             "measurement": {
-                "mean": 2234.921875,
-                "stddev": 55.597945931453935,
+                "mean": 935.390625,
+                "stddev": 252.9784852782384,
                 "iterations": 20,
                 "count": 64
             }
@@ -37,8 +37,8 @@
             "label": "add 13 months, Clamp",
             "unit": "core",
             "measurement": {
-                "mean": 1792.96875,
-                "stddev": 118.76387665631962,
+                "mean": 726.09375,
+                "stddev": 74.58396982386698,
                 "iterations": 20,
                 "count": 64
             }
@@ -47,8 +47,8 @@
             "label": "long format, Nepali, with weekday",
             "unit": "core",
             "measurement": {
-                "mean": 1066.640625,
-                "stddev": 22.269188311361397,
+                "mean": 553.515625,
+                "stddev": 4.1889864432670345,
                 "iterations": 20,
                 "count": 64
             }
@@ -57,8 +57,8 @@
             "label": "strict parse of YYYY\/MM\/DD",
             "unit": "core",
             "measurement": {
-                "mean": 2525.234375,
-                "stddev": 52.431770675534835,
+                "mean": 962.65625,
+                "stddev": 9.295233573584905,
                 "iterations": 20,
                 "count": 64
             }
@@ -67,8 +67,8 @@
             "label": "patro info (tithi, holiday, events)",
             "unit": "patro",
             "measurement": {
-                "mean": 2105.078125,
-                "stddev": 33.04188792157426,
+                "mean": 322.890625,
+                "stddev": 5.350849633177426,
                 "iterations": 20,
                 "count": 64
             }
@@ -77,8 +77,8 @@
             "label": "patro month grid (every day of the month)",
             "unit": "patro",
             "measurement": {
-                "mean": 115489.765625,
-                "stddev": 2068.5459134486046,
+                "mean": 20887.65625,
+                "stddev": 3224.150123451867,
                 "iterations": 20,
                 "count": 64
             }
@@ -89,13 +89,13 @@
             "results": [
                 {
                     "label": "BS to AD",
-                    "ns": 1470821.7741935481,
+                    "ns": 1516770.8064516126,
                     "agrees": "60 of 64 (62 accepted)",
                     "accepted": 62
                 },
                 {
                     "label": "AD to BS (text)",
-                    "ns": 1676688.2258064516,
+                    "ns": 1534717.9032258065,
                     "agrees": "60 of 64 (62 accepted)",
                     "accepted": 62
                 }
@@ -105,13 +105,13 @@
             "results": [
                 {
                     "label": "BS to AD",
-                    "ns": 5773986.7741935495,
+                    "ns": 3661035.8064516126,
                     "agrees": "60 of 64 (62 accepted)",
                     "accepted": 62
                 },
                 {
                     "label": "AD to BS (text)",
-                    "ns": 4913110.322580645,
+                    "ns": 3178988.8709677416,
                     "agrees": "60 of 64 (62 accepted)",
                     "accepted": 62
                 }

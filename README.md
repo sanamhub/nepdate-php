@@ -337,7 +337,7 @@ The design in short:
 `bench/run.php` measures B1 to B8 of the shared benchmark protocol over the shared 64 dates, next to
 the two mature PHP libraries listed in
 [docs/competitors.md](https://github.com/sanamhub/nepdate-php/blob/main/docs/competitors.md). The
-current figures are preliminary; the method, the machine and the numbers are in
+figures come from a run on an idle machine; the method, the machine and the numbers are in
 [docs/benchmarks.md](https://github.com/sanamhub/nepdate-php/blob/main/docs/benchmarks.md).
 
 <!-- family:start -->
