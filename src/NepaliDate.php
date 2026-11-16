@@ -25,6 +25,14 @@ use Stringable;
  */
 final class NepaliDate implements Stringable, JsonSerializable
 {
+    private const int SECONDS_PER_DAY = 86400;
+
+    /** Midnight today in `$midnightZone`; `toDateTime` moves it to the wanted date. */
+    private static ?DateTimeImmutable $midnight = null;
+
+    /** The default time zone `$midnight` was built in. */
+    private static string $midnightZone = '';
+
     private function __construct(
         private readonly int $year,
         private readonly int $month,
@@ -37,24 +45,23 @@ final class NepaliDate implements Stringable, JsonSerializable
 
     public static function fromBs(int $year, int $month, int $day): self
     {
-        Calendar::validate($year, $month, $day);
-
-        return new self($year, $month, $day, Calendar::toSerial($year, $month, $day));
+        return new self($year, $month, $day, Calendar::serialOf($year, $month, $day));
     }
 
     public static function fromGregorian(DateTimeInterface $date): self
     {
-        $y = (int) $date->format('Y');
-        $m = (int) $date->format('n');
-        $d = (int) $date->format('j');
+        // The day on the wall clock of the value's own zone, counted from 1970-01-01, without
+        // formatting the three fields: seconds since the epoch plus the zone offset, floored to days.
+        $seconds = $date->getTimestamp() + $date->getOffset();
+        $remainder = $seconds % self::SECONDS_PER_DAY;
+        $days = intdiv($seconds - $remainder, self::SECONDS_PER_DAY) - ($remainder < 0 ? 1 : 0);
 
-        if (!Calendar::isValidGregorian($y, $m, $d)) {
-            throw new NepDateException(ErrorKind::InvalidGregorian, "{$y}-{$m}-{$d} is not a real Gregorian date");
-        }
-
-        $serial = Calendar::daysFromCivil($y, $m, $d) - CalendarTable::EPOCH_UNIX_DAYS;
+        $serial = $days - CalendarTable::EPOCH_UNIX_DAYS;
         if ($serial < 0 || $serial > CalendarTable::MAX_SERIAL) {
-            throw new NepDateException(ErrorKind::OutOfRange, "{$y}-{$m}-{$d} is outside the supported range");
+            throw new NepDateException(
+                ErrorKind::OutOfRange,
+                $date->format('Y-n-j') . ' is outside the supported range',
+            );
         }
 
         return self::fromSerial($serial);
@@ -79,9 +86,14 @@ final class NepaliDate implements Stringable, JsonSerializable
 
     private static function fromSerial(int $serial): self
     {
-        [$y, $m, $d] = Calendar::fromSerial($serial);
+        $index = Calendar::monthIndexOf($serial);
 
-        return new self($y, $m, $d, $serial);
+        return new self(
+            CalendarTable::MIN_YEAR + (int) ($index / 12),
+            $index % 12 + 1,
+            $serial - CalendarTable::MONTH_START[$index] + 1,
+            $serial,
+        );
     }
 
     private static function fromParts(int $year, int $month, int $day, int $serial): self
@@ -236,7 +248,7 @@ final class NepaliDate implements Stringable, JsonSerializable
 
     public function dayOfYear(): int
     {
-        return $this->serial - CalendarTable::YEAR_START[$this->year - CalendarTable::MIN_YEAR] + 1;
+        return $this->serial - CalendarTable::MONTH_START[($this->year - CalendarTable::MIN_YEAR) * 12] + 1;
     }
 
     public function monthLength(): int
@@ -246,9 +258,9 @@ final class NepaliDate implements Stringable, JsonSerializable
 
     public function yearLength(): int
     {
-        $index = $this->year - CalendarTable::MIN_YEAR;
+        $index = ($this->year - CalendarTable::MIN_YEAR) * 12;
 
-        return CalendarTable::YEAR_START[$index + 1] - CalendarTable::YEAR_START[$index];
+        return CalendarTable::MONTH_START[$index + 12] - CalendarTable::MONTH_START[$index];
     }
 
     public function serial(): int
@@ -260,7 +272,15 @@ final class NepaliDate implements Stringable, JsonSerializable
     {
         [$y, $m, $d] = Calendar::civilFromDays($this->serial + CalendarTable::EPOCH_UNIX_DAYS);
 
-        return new DateTimeImmutable(sprintf('%04d-%02d-%02d', $y, $m, $d));
+        // Setting the date on a kept midnight is about three times faster than parsing a date
+        // string. The kept value follows the default time zone, which a program may change.
+        $zone = date_default_timezone_get();
+        if (self::$midnight === null || self::$midnightZone !== $zone) {
+            self::$midnight = new DateTimeImmutable('today');
+            self::$midnightZone = $zone;
+        }
+
+        return self::$midnight->setDate($y, $m, $d);
     }
 
     public function lastDayOfMonth(): self
@@ -320,35 +340,33 @@ final class NepaliDate implements Stringable, JsonSerializable
     public function addMonths(int $months, MonthOverflow $overflow = MonthOverflow::Clamp): self
     {
         $total = ($this->year - CalendarTable::MIN_YEAR) * 12 + ($this->month - 1) + $months;
-        $totalMonths = CalendarTable::YEARS * 12;
-        if ($total < 0 || $total >= $totalMonths) {
+        if ($total < 0 || $total >= CalendarTable::MONTHS) {
             throw new NepDateException(ErrorKind::OutOfRange, "month offset {$months} is outside the range");
         }
 
-        $year = CalendarTable::MIN_YEAR + intdiv($total, 12);
+        $year = CalendarTable::MIN_YEAR + (int) ($total / 12);
         $month = $total % 12 + 1;
-        $length = Calendar::monthLength($year, $month);
+        $start = CalendarTable::MONTH_START[$total];
+        $length = CalendarTable::MONTH_START[$total + 1] - $start;
 
         if ($this->day <= $length) {
-            return self::fromBs($year, $month, $this->day);
+            return new self($year, $month, $this->day, $start + $this->day - 1);
         }
 
         if ($overflow === MonthOverflow::Spill) {
-            if ($month === 12) {
-                $year++;
-                $month = 1;
-            } else {
-                $month++;
-            }
-            if ($year > CalendarTable::MAX_YEAR) {
+            if ($total + 1 >= CalendarTable::MONTHS) {
                 throw new NepDateException(ErrorKind::OutOfRange, "month offset {$months} spills past the range");
             }
-            $day = $this->day - $length;
+            // The days past the month's end (at most three) carry into the next month, so the
+            // serial is the one the day would have had in a longer month.
+            $serial = $start + $this->day - 1;
 
-            return self::fromBs($year, $month, $day);
+            return $month === 12
+                ? new self($year + 1, 1, $this->day - $length, $serial)
+                : new self($year, $month + 1, $this->day - $length, $serial);
         }
 
-        return self::fromBs($year, $month, $length);
+        return new self($year, $month, $length, $start + $length - 1);
     }
 
     public function addYears(int $years, MonthOverflow $overflow = MonthOverflow::Clamp): self

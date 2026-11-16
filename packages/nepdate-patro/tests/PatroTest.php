@@ -42,6 +42,15 @@ final class PatroTest extends TestCase
         ]);
     }
 
+    public function testTheSameDayGetsTheSameAnswerObject(): void
+    {
+        $first = info(NepaliDate::fromBs(2081, 1, 1));
+        $again = info(NepaliDate::parse('2081-01-01'));
+        self::assertSame($first, $again);
+        self::assertNotSame($first, info(NepaliDate::fromBs(2081, 1, 2)));
+        self::assertSame('Panchami', $again->tithi()?->en);
+    }
+
     public function testADayWithoutDataIsEmptyRatherThanFailing(): void
     {
         foreach (['2070-06-15', '2090-01-01', '1901-01-01', '2199-12-30'] as $text) {

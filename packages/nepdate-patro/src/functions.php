@@ -17,8 +17,21 @@ use NepDate\Patro\Internal\Serials;
  */
 function info(NepaliDate $date): CalendarInfo
 {
+    /** @var array<int, CalendarInfo> $known the answer of each day already asked for */
+    static $known = [];
+
     $serial = $date->serial();
 
+    return $known[$serial] ??= lookUp($serial);
+}
+
+/**
+ * Reads the tables for the day at `$serial`. The values are immutable, so `info` keeps one per day.
+ *
+ * @internal
+ */
+function lookUp(int $serial): CalendarInfo
+{
     $tithi = null;
     if ($serial >= PatroTable::TITHI_FIRST_SERIAL && $serial <= PatroTable::TITHI_LAST_SERIAL) {
         $tithi = new Tithi(...PatroTable::NAMES[PatroTable::TITHI_INDEX[$serial - PatroTable::TITHI_FIRST_SERIAL]]);
