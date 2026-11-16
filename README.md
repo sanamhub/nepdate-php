@@ -31,10 +31,10 @@ The API is listed in [docs/API.md](https://github.com/sanamhub/nepdate-php/blob/
 ## Install
 
 ```sh
-composer require "sanamhub/nepdate:^0.2@rc"
+composer require "sanamhub/nepdate:^1.0@rc"
 ```
 
-The `@rc` flag is needed while only the release candidate exists; once 0.2.0 is out,
+The `@rc` flag is needed while only the release candidate exists; once 1.0.0 is out,
 `composer require sanamhub/nepdate` is enough.
 
 ## Quick start
@@ -266,7 +266,7 @@ $today->addDays(1)->isTomorrow($zone); // => true
 The core has no patro data. Install both packages:
 
 ```sh
-composer require "sanamhub/nepdate:^0.2@rc" "sanamhub/nepdate-patro:^0.2@rc"
+composer require "sanamhub/nepdate:^1.0@rc" "sanamhub/nepdate-patro:^1.0@rc"
 ```
 
 The functions live in the `NepDate\Patro` namespace (`use function NepDate\Patro\info;`) and answer
@@ -313,7 +313,7 @@ The design in short:
 ## Supported versions
 
 - PHP 8.3, 8.4 and 8.5, tested on Linux, macOS and Windows.
-- The current version line is `0.2`. Both packages share one version number, and the other
+- The current version line is `1.0`. Both packages share one version number, and the other
   [NepDate ports](https://github.com/sanamhub/nepdate#packages) follow the same line.
 - Security fixes go to the latest release only; see
   [SECURITY.md](https://github.com/sanamhub/nepdate-php/blob/main/SECURITY.md).
