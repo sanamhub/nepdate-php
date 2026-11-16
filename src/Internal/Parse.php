@@ -20,6 +20,8 @@ final class Parse
 {
     private const int GROUP_COUNT = 3;
     private const int MAX_DIGITS = 4;
+    private const int CANONICAL_LENGTH = 10;
+    private const string ASCII_DIGITS = '0123456789';
 
     /** The ASCII separators of PARSING.md §1, by byte: - / . _ \ space | */
     private const array ASCII_SEPARATORS = [
@@ -40,6 +42,19 @@ final class Parse
      */
     public static function strict(string $s): array
     {
+        // The canonical shape, `YYYY/MM/DD` with any ASCII separator, is read with three native
+        // calls. Anything else, Devanagari digits included, takes the scanner below, which gives
+        // the same answer for this shape.
+        if (
+            strlen($s) === self::CANONICAL_LENGTH
+            && isset(self::ASCII_SEPARATORS[ord($s[4])], self::ASCII_SEPARATORS[ord($s[7])])
+            && strspn($s, self::ASCII_DIGITS, 0, 4) === 4
+            && strspn($s, self::ASCII_DIGITS, 5, 2) === 2
+            && strspn($s, self::ASCII_DIGITS, 8, 2) === 2
+        ) {
+            return [(int) substr($s, 0, 4), (int) substr($s, 5, 2), (int) substr($s, 8, 2)];
+        }
+
         $groups = [0, 0, 0];
         $count = 0;
         $inGroup = false;

@@ -43,40 +43,74 @@ final class Names
         'ne' => ['आइत', 'सोम', 'मङ्गल', 'बुध', 'बिहि', 'शुक्र', 'शनि'],
     ];
 
-    private const array DIGIT_MAP = [
-        '0' => '०', '1' => '१', '2' => '२', '3' => '३', '4' => '४',
-        '5' => '५', '6' => '६', '7' => '७', '8' => '८', '9' => '९',
+    // Every number a date prints is below 100, or a year made of two such halves, so the
+    // formatters read these tables instead of padding and translating on each call.
+
+    /** @var list<string> `00` to `99`. */
+    private const array TWO_DIGITS_EN = [
+        '00', '01', '02', '03', '04', '05', '06', '07', '08', '09',
+        '10', '11', '12', '13', '14', '15', '16', '17', '18', '19',
+        '20', '21', '22', '23', '24', '25', '26', '27', '28', '29',
+        '30', '31', '32', '33', '34', '35', '36', '37', '38', '39',
+        '40', '41', '42', '43', '44', '45', '46', '47', '48', '49',
+        '50', '51', '52', '53', '54', '55', '56', '57', '58', '59',
+        '60', '61', '62', '63', '64', '65', '66', '67', '68', '69',
+        '70', '71', '72', '73', '74', '75', '76', '77', '78', '79',
+        '80', '81', '82', '83', '84', '85', '86', '87', '88', '89',
+        '90', '91', '92', '93', '94', '95', '96', '97', '98', '99',
     ];
 
-    /** Format `$n` in ASCII, zero-padded to `$minWidth`, then map the digits to Devanagari. */
-    public static function toNepaliDigits(int $n, int $minWidth = 0): string
-    {
-        $ascii = str_pad((string) $n, $minWidth, '0', STR_PAD_LEFT);
+    /** @var list<string> `००` to `९९`. */
+    private const array TWO_DIGITS_NE = [
+        '००', '०१', '०२', '०३', '०४', '०५', '०६', '०७', '०८', '०९',
+        '१०', '११', '१२', '१३', '१४', '१५', '१६', '१७', '१८', '१९',
+        '२०', '२१', '२२', '२३', '२४', '२५', '२६', '२७', '२८', '२९',
+        '३०', '३१', '३२', '३३', '३४', '३५', '३६', '३७', '३८', '३९',
+        '४०', '४१', '४२', '४३', '४४', '४५', '४६', '४७', '४८', '४९',
+        '५०', '५१', '५२', '५३', '५४', '५५', '५६', '५७', '५८', '५९',
+        '६०', '६१', '६२', '६३', '६४', '६५', '६६', '६७', '६८', '६९',
+        '७०', '७१', '७२', '७३', '७४', '७५', '७६', '७७', '७८', '७९',
+        '८०', '८१', '८२', '८३', '८४', '८५', '८६', '८७', '८८', '८९',
+        '९०', '९१', '९२', '९३', '९४', '९५', '९६', '९७', '९८', '९९',
+    ];
 
-        return strtr($ascii, self::DIGIT_MAP);
-    }
+    /** @var list<string> `०` to `९९`, not padded. */
+    private const array PLAIN_NE = [
+        '०', '१', '२', '३', '४', '५', '६', '७', '८', '९',
+        '१०', '११', '१२', '१३', '१४', '१५', '१६', '१७', '१८', '१९',
+        '२०', '२१', '२२', '२३', '२४', '२५', '२६', '२७', '२८', '२९',
+        '३०', '३१', '३२', '३३', '३४', '३५', '३६', '३७', '३८', '३९',
+        '४०', '४१', '४२', '४३', '४४', '४५', '४६', '४७', '४८', '४९',
+        '५०', '५१', '५२', '५३', '५४', '५५', '५६', '५७', '५८', '५९',
+        '६०', '६१', '६२', '६३', '६४', '६५', '६६', '६७', '६८', '६९',
+        '७०', '७१', '७२', '७३', '७४', '७५', '७६', '७७', '७८', '७९',
+        '८०', '८१', '८२', '८३', '८४', '८५', '८६', '८७', '८८', '८९',
+        '९०', '९१', '९२', '९३', '९४', '९५', '९६', '९७', '९८', '९९',
+    ];
 
-    /** The digit string for `$n` (0..32) in `$lang`, zero-padded to two digits when `$pad`. */
+    /** The digit string for `$n` (0..99) in `$lang`, zero-padded to two digits when `$pad`. */
     public static function dayDigits(int $n, bool $pad, \NepDate\Lang $lang): string
     {
-        $text = $pad ? str_pad((string) $n, 2, '0', STR_PAD_LEFT) : (string) $n;
+        if ($lang === \NepDate\Lang::Ne) {
+            return $pad ? self::TWO_DIGITS_NE[$n] : self::PLAIN_NE[$n];
+        }
 
-        return $lang === \NepDate\Lang::Ne ? strtr($text, self::DIGIT_MAP) : $text;
+        return $pad ? self::TWO_DIGITS_EN[$n] : (string) $n;
     }
 
-    /** The four-digit year string for `$year` in `$lang`. */
+    /** The four-digit year string for `$year` (1000..9999) in `$lang`. */
     public static function yearDigits(int $year, \NepDate\Lang $lang): string
     {
-        $text = (string) $year;
+        if ($lang === \NepDate\Lang::Ne) {
+            return self::TWO_DIGITS_NE[(int) ($year / 100)] . self::TWO_DIGITS_NE[$year % 100];
+        }
 
-        return $lang === \NepDate\Lang::Ne ? strtr($text, self::DIGIT_MAP) : $text;
+        return (string) $year;
     }
 
     /** The two-digit year string for `$year % 100` in `$lang`. */
     public static function year2Digits(int $yearMod100, \NepDate\Lang $lang): string
     {
-        $text = str_pad((string) $yearMod100, 2, '0', STR_PAD_LEFT);
-
-        return $lang === \NepDate\Lang::Ne ? strtr($text, self::DIGIT_MAP) : $text;
+        return $lang === \NepDate\Lang::Ne ? self::TWO_DIGITS_NE[$yearMod100] : self::TWO_DIGITS_EN[$yearMod100];
     }
 }

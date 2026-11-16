@@ -24,8 +24,7 @@ $maxYear = jsonInt($data['max_year'] ?? null, 'max_year');
 $years = $maxYear - $minYear + 1;
 $lengths = jsonObject($data['month_lengths'] ?? null, 'month_lengths');
 
-$packed = [];
-$yearStart = [0];
+$monthStart = [0];
 $total = 0;
 for ($i = 0; $i < $years; $i++) {
     $year = (string) ($minYear + $i);
@@ -38,25 +37,27 @@ for ($i = 0; $i < $years; $i++) {
         fwrite(STDERR, "year $year does not have 12 months\n");
         exit(1);
     }
-    $p = 0;
-    $sum = 0;
     foreach ($months as $m => $len) {
         if ($len < 29 || $len > 32) {
             fwrite(STDERR, "year $year month " . ($m + 1) . " length $len out of range 29..32\n");
             exit(1);
         }
-        $p |= ($len - 29) << (2 * $m);
-        $sum += $len;
+        $total += $len;
+        $monthStart[] = $total;
     }
-    $packed[] = $p;
-    $total += $sum;
-    $yearStart[] = $total;
 }
 
 $maxSerial = $total - 1;
 
-$packedLiteral = implode(', ', $packed);
-$yearStartLiteral = implode(', ', $yearStart);
+// One line per year: twelve month starts, then the year as a comment.
+$monthStartLines = [];
+for ($i = 0; $i < $years; $i++) {
+    $monthStartLines[] = '        '
+        . implode(', ', array_slice($monthStart, $i * 12, 12))
+        . ', // ' . ($minYear + $i);
+}
+$monthStartLiteral = implode("\n", $monthStartLines);
+$monthCount = $years * 12;
 
 $source = jsonObject($data['source'] ?? null, 'source');
 $generatedFrom = sprintf(
@@ -84,16 +85,22 @@ $php = <<<PHP
         public const int MIN_YEAR = $minYear;
         public const int MAX_YEAR = $maxYear;
         public const int YEARS = $years;
+        public const int MONTHS = $monthCount;
         public const int TOTAL_DAYS = $total;
         public const int MAX_SERIAL = $maxSerial;
         public const int EPOCH_UNIX_DAYS = -45920;
         public const int EPOCH_WEEKDAY = 4;
 
-        /** @var list<int> Two bits per month (length - 29), index 0 = MIN_YEAR. */
-        public const array PACKED = [$packedLiteral];
-
-        /** @var list<int> Cumulative day count at the start of each year; index YEARS = TOTAL_DAYS. */
-        public const array YEAR_START = [$yearStartLiteral];
+        /**
+         * The serial of the first day of each month, index `(year - MIN_YEAR) * 12 + month - 1`;
+         * index MONTHS = TOTAL_DAYS, so a month's length is the difference of two neighbours.
+         *
+         * @var list<int>
+         */
+        public const array MONTH_START = [
+    $monthStartLiteral
+            $total,
+        ];
     }
 
     PHP;

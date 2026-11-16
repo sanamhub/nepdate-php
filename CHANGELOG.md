@@ -7,6 +7,17 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Every operation is faster, with the same results (ADR-0008). Measured before and after on the
+  same machine: AD to BS 2337 ns to 684 ns, adding days 2035 ns to 884 ns, strict parse 2524 ns to
+  1082 ns, patro `info` 1979 ns to 351 ns, a patro month grid 112 µs to 24 µs.
+  - The calendar is one table of month starts; a conversion reads it once.
+  - `fromGregorian` reads the day from the timestamp and the zone offset, and `toDateTime` sets
+    the date on a kept midnight. Neither formats or parses a date string.
+  - Digits come from constant tables, and `parse` reads `YYYY/MM/DD` with native calls.
+  - `info()` returns the same `CalendarInfo` object for the same day.
+
 ## [1.0.0-rc.1] - 2026-11-04
 
 ### Changed

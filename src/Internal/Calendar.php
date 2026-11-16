@@ -14,68 +14,25 @@ use NepDate\NepDateException;
  */
 final class Calendar
 {
-    /** @var list<int> January to December of a common Gregorian year. */
-    private const array GREGORIAN_MONTH_LENGTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-
     /** The length of BS month `$month` (1-12) of BS year `$year`, 29 through 32. */
     public static function monthLength(int $year, int $month): int
     {
-        $index = $year - CalendarTable::MIN_YEAR;
-        if ($index < 0 || $index >= CalendarTable::YEARS) {
+        if ($year < CalendarTable::MIN_YEAR || $year > CalendarTable::MAX_YEAR) {
             throw new NepDateException(
                 ErrorKind::OutOfRange,
                 "year {$year} is outside " . CalendarTable::MIN_YEAR . '..' . CalendarTable::MAX_YEAR,
             );
         }
+        $index = ($year - CalendarTable::MIN_YEAR) * 12 + $month - 1;
 
-        $packed = CalendarTable::PACKED[$index];
-
-        return 29 + (($packed >> (2 * ($month - 1))) & 0b11);
-    }
-
-    /** The serial day number (0-based from 1901-01-01 BS) of a validated BS date. */
-    public static function toSerial(int $year, int $month, int $day): int
-    {
-        $serial = CalendarTable::YEAR_START[$year - CalendarTable::MIN_YEAR];
-        for ($m = 1; $m < $month; $m++) {
-            $serial += self::monthLength($year, $m);
-        }
-
-        return $serial + $day - 1;
+        return CalendarTable::MONTH_START[$index + 1] - CalendarTable::MONTH_START[$index];
     }
 
     /**
-     * @return array{0: int, 1: int, 2: int} year, month, day for a valid serial
+     * The serial day number (0-based from 1901-01-01 BS) of a BS date, after checking the year,
+     * the month and the day in that order.
      */
-    public static function fromSerial(int $serial): array
-    {
-        $years = CalendarTable::YEAR_START;
-        $lo = 0;
-        $hi = CalendarTable::YEARS - 1;
-        while ($lo < $hi) {
-            $mid = intdiv($lo + $hi + 1, 2);
-            if ($years[$mid] <= $serial) {
-                $lo = $mid;
-            } else {
-                $hi = $mid - 1;
-            }
-        }
-        $year = CalendarTable::MIN_YEAR + $lo;
-        $remaining = $serial - $years[$lo];
-        $month = 1;
-        while (true) {
-            $length = self::monthLength($year, $month);
-            if ($remaining < $length) {
-                break;
-            }
-            $remaining -= $length;
-            $month++;
-        }
-
-        return [$year, $month, $remaining + 1];
-    }
-
-    public static function validate(int $year, int $month, int $day): void
+    public static function serialOf(int $year, int $month, int $day): int
     {
         if ($year < CalendarTable::MIN_YEAR || $year > CalendarTable::MAX_YEAR) {
             throw new NepDateException(
@@ -86,23 +43,53 @@ final class Calendar
         if ($month < 1 || $month > 12) {
             throw new NepDateException(ErrorKind::InvalidMonth, "month {$month} is outside 1..12");
         }
-        $length = self::monthLength($year, $month);
+        $index = ($year - CalendarTable::MIN_YEAR) * 12 + $month - 1;
+        $start = CalendarTable::MONTH_START[$index];
+        $length = CalendarTable::MONTH_START[$index + 1] - $start;
         if ($day < 1 || $day > $length) {
             throw new NepDateException(ErrorKind::InvalidDay, "day {$day} is outside 1..{$length}");
         }
+
+        return $start + $day - 1;
     }
 
-    /** Proleptic Gregorian civil date to days since 1970-01-01 (Howard Hinnant's algorithm). */
-    public static function daysFromCivil(int $y, int $m, int $d): int
+    /**
+     * The month index `(year - MIN_YEAR) * 12 + month - 1` of the month that holds a valid serial.
+     *
+     * A BS month is 30.44 days long on average, so the index is first estimated by proportion and
+     * then corrected by a step or two.
+     */
+    public static function monthIndexOf(int $serial): int
     {
-        $y -= $m <= 2 ? 1 : 0;
-        $era = intdiv($y >= 0 ? $y : $y - 399, 400);
-        $yoe = $y - $era * 400;
-        $mp = ($m + 9) % 12;
-        $doy = intdiv($mp * 153 + 2, 5) + $d - 1;
-        $doe = $yoe * 365 + intdiv($yoe, 4) - intdiv($yoe, 100) + $doy;
+        $starts = CalendarTable::MONTH_START;
+        $index = (int) ($serial * CalendarTable::MONTHS / CalendarTable::TOTAL_DAYS);
+        while ($starts[$index] > $serial) {
+            $index--;
+        }
+        while ($starts[$index + 1] <= $serial) {
+            $index++;
+        }
 
-        return $era * 146097 + $doe - 719468;
+        return $index;
+    }
+
+    /**
+     * @return array{0: int, 1: int, 2: int} year, month, day for a valid serial
+     */
+    public static function fromSerial(int $serial): array
+    {
+        $index = self::monthIndexOf($serial);
+
+        return [
+            CalendarTable::MIN_YEAR + (int) ($index / 12),
+            $index % 12 + 1,
+            $serial - CalendarTable::MONTH_START[$index] + 1,
+        ];
+    }
+
+    public static function validate(int $year, int $month, int $day): void
+    {
+        self::serialOf($year, $month, $day);
     }
 
     /**
@@ -122,29 +109,5 @@ final class Calendar
         $y += $m <= 2 ? 1 : 0;
 
         return [$y, $m, $d];
-    }
-
-    /** Whether `$y-$m-$d` is a real proleptic Gregorian date. */
-    public static function isValidGregorian(int $y, int $m, int $d): bool
-    {
-        if ($m < 1 || $m > 12) {
-            return false;
-        }
-
-        return $d >= 1 && $d <= self::gregorianMonthLength($y, $m);
-    }
-
-    public static function gregorianMonthLength(int $y, int $m): int
-    {
-        if ($m === 2 && self::isGregorianLeapYear($y)) {
-            return 29;
-        }
-
-        return self::GREGORIAN_MONTH_LENGTHS[$m - 1];
-    }
-
-    public static function isGregorianLeapYear(int $y): bool
-    {
-        return ($y % 4 === 0 && $y % 100 !== 0) || $y % 400 === 0;
     }
 }
