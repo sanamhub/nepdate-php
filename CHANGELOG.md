@@ -9,6 +9,7 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- `sanamhub/nepdate-patro` requires exactly the same `sanamhub/nepdate` version (ADR-0009), not a caret range.
 - Every operation is faster, with the same results (ADR-0008). Measured before and after on the
   same machine: AD to BS 2337 ns to 684 ns, adding days 2035 ns to 884 ns, strict parse 2524 ns to
   1082 ns, patro `info` 1979 ns to 351 ns, a patro month grid 112 µs to 24 µs.

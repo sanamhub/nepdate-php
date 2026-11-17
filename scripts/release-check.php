@@ -43,9 +43,9 @@ if (($patro['version'] ?? null) !== $version) {
 
 $require = $patro['require'] ?? null;
 $constraint = is_array($require) ? ($require['sanamhub/nepdate'] ?? null) : null;
-if ($constraint !== '^' . $version) {
+if ($constraint !== $version) {
     $errors[] = 'packages/nepdate-patro requires '
-        . (is_string($constraint) ? $constraint : 'nothing') . ", expected ^{$version}";
+        . (is_string($constraint) ? $constraint : 'nothing') . ", expected exactly {$version}";
 }
 
 $changelog = file_get_contents($root . '/CHANGELOG.md');

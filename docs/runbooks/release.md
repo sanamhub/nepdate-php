@@ -40,7 +40,7 @@ does the checks and the packaging; this file is what a human has to do around it
 1. Land the changes on `main` with a changelog line under `Unreleased`.
 2. Bump the version in both manifests and in the patro package's constraint:
    - `composer.json` → `version`
-   - `packages/nepdate-patro/composer.json` → `version` and `require["sanamhub/nepdate"]`
+   - `packages/nepdate-patro/composer.json` → `version` and `require["sanamhub/nepdate"]` (the same version, no `^`, ADR-0009)
 
    `scripts/version.php` and `scripts/release-check.php` check all three.
 3. Run `composer ci` locally.

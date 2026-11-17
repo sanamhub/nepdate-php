@@ -24,7 +24,7 @@
     },
     "require": {
         "php": "^8.3",
-        "sanamhub/nepdate": "^1.0.0-rc.1"
+        "sanamhub/nepdate": "1.0.0-rc.1"
     },
     "autoload": {
         "psr-4": {

@@ -65,8 +65,8 @@ $constraint = is_array($require) ? ($require['sanamhub/nepdate'] ?? null) : null
 if (!is_string($constraint)) {
     fail('packages/nepdate-patro does not require sanamhub/nepdate');
 }
-if ($constraint !== '^' . $version) {
-    fail("packages/nepdate-patro requires {$constraint}, expected ^" . $version);
+if ($constraint !== $version) {
+    fail("packages/nepdate-patro requires {$constraint}, expected exactly " . $version);
 }
 
 require __DIR__ . '/lib/cli.php';

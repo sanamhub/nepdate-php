@@ -13,6 +13,7 @@ names its status, its date, the problem, the decision and what follows from it.
 | [0006](0006-tests-and-gates.md) | Tests, gates, coverage and mutation | accepted |
 | [0007](0007-releases-and-publishing.md) | Releases and publishing | accepted |
 | [0008](0008-month-start-table-and-fast-paths.md) | One month-start table, and the fast paths built on it | accepted |
+| [0009](0009-patro-pins-the-exact-core-version.md) | The patro requires exactly the same core version | accepted |
 
 Behaviour that a decision of the shared spec already covers is not an ADR here; it is a `D-xx` row
 of `shared/spec/PARITY.md`, and the code names that row where it applies.
