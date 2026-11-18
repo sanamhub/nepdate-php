@@ -16,8 +16,8 @@ from the core [`sanamhub/nepdate`](https://packagist.org/packages/sanamhub/nepda
 the hub [`sanamhub/nepdate`](https://github.com/sanamhub/nepdate), which derives it from the C#
 original, [NepDate](https://github.com/RajuPrasai/NepDate).
 
-> **Status:** 1.0.0-rc.1, the release candidate on the 1.0 line, on Packagist; the API is stable
-> from 1.0 (hub ADR-0009). The data is informational, not an official calendar.
+> **Status:** 1.0.0, on Packagist; the API is stable from 1.0 (hub ADR-0009). The data is
+> informational, not an official calendar.
 
 ## Install
 
@@ -25,12 +25,7 @@ original, [NepDate](https://github.com/RajuPrasai/NepDate).
 composer require sanamhub/nepdate-patro
 ```
 
-The package depends on `sanamhub/nepdate`, so the core arrives with it. While only the release
-candidate exists, ask for it explicitly:
-
-```sh
-composer require "sanamhub/nepdate:^1.0@rc" "sanamhub/nepdate-patro:^1.0@rc"
-```
+The package depends on `sanamhub/nepdate`, so the core arrives with it.
 
 ## Example
 

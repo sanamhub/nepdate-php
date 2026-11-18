@@ -31,11 +31,8 @@ The API is listed in [docs/API.md](https://github.com/sanamhub/nepdate-php/blob/
 ## Install
 
 ```sh
-composer require "sanamhub/nepdate:^1.0@rc"
+composer require sanamhub/nepdate
 ```
-
-The `@rc` flag is needed while only the release candidate exists; once 1.0.0 is out,
-`composer require sanamhub/nepdate` is enough.
 
 ## Quick start
 

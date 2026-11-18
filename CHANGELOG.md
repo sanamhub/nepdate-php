@@ -7,6 +7,8 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-18
+
 ### Changed
 
 - `sanamhub/nepdate-patro` requires exactly the same `sanamhub/nepdate` version (ADR-0009), not a caret range.
