@@ -33,20 +33,20 @@ operation. Every result is consumed by the harness, so nothing is optimised away
 
 | ID | Operation | Unit | ns/op | sd | C# NepDate ns/op |
 |---|---|---|---:|---:|---:|
-| B1 | BS to AD: `fromBs`, then `toDateTime` | core | 986 | 31 | 13.27 |
-| B2 | AD to BS: `fromGregorian` | core | 785 | 198 | 18.70 |
-| B3 | add 1000 days | core | 935 | 253 | 20.06 |
-| B4 | add 13 months, `MonthOverflow::Clamp` | core | 726 | 75 | 19.30 |
-| B5 | long format, Nepali, with weekday | core | 554 | 4 | 139.04 |
-| B6 | strict parse of `YYYY/MM/DD` | core | 963 | 9 | 21.13 |
-| B7 | patro info (tithi, holiday, events) | patro | 323 | 5 | 48.63 |
-| B8 | patro month grid (every day of the month) | patro | 20,888 | 3,224 | 3,274.50 |
+| B1 | BS to AD: `fromBs`, then `toDateTime` | core | 986 | 31 | 5.60 |
+| B2 | AD to BS: `fromGregorian` | core | 785 | 198 | 5.90 |
+| B3 | add 1000 days | core | 935 | 253 | 2.79 |
+| B4 | add 13 months, `MonthOverflow::Clamp` | core | 726 | 75 | 2.45 |
+| B5 | long format, Nepali, with weekday | core | 554 | 4 | 29.96 |
+| B6 | strict parse of `YYYY/MM/DD` | core | 963 | 9 | 7.28 |
+| B7 | patro info (tithi, holiday, events) | patro | 323 | 5 | 16.46 |
+| B8 | patro month grid (every day of the month) | patro | 20,888 | 3,224 | 633.13 |
 
 The C# column is the .NET 10 column of the hub's
 [`docs/benchmarks/dotnet.md`](https://github.com/sanamhub/nepdate/blob/main/docs/benchmarks/dotnet.md),
-measured on the same machine on 2026-11-16 with BenchmarkDotNet. BENCHMARK section 6 gives PHP no
+measured on the same machine on 2026-11-20 with BenchmarkDotNet. BENCHMARK section 6 gives PHP no
 fixed target: "C, Dart, PHP, Zig: no fixed target: the numbers are reported beside C# NepDate and
-the selected competitors". PHP is an interpreter and runs this port 4 to 74 times slower than
+the selected competitors". PHP is an interpreter and runs this port 18 to 335 times slower than
 C# on B1 to B7; the table is reported as it is.
 
 B2, B3 and B8 vary more between iterations than the other rows (the sd column). A second run
