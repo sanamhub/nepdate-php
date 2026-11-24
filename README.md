@@ -320,7 +320,7 @@ The design in short:
 | Page | What it covers |
 |---|---|
 | [API](https://github.com/sanamhub/nepdate-php/blob/main/docs/API.md) | The complete public surface, with an example for every item |
-| [Benchmarks](https://github.com/sanamhub/nepdate-php/blob/main/docs/benchmarks.md) | B1 to B8 against the other PHP libraries and C# NepDate |
+| [Benchmarks](https://github.com/sanamhub/nepdate-php/blob/main/docs/benchmarks.md) | B1 to B8 against the other PHP libraries |
 | [Competitors](https://github.com/sanamhub/nepdate-php/blob/main/docs/competitors.md) | The PHP libraries in the benchmark |
 | [ADRs](https://github.com/sanamhub/nepdate-php/blob/main/docs/adr/README.md) | Why the design is what it is |
 | [Release runbook](https://github.com/sanamhub/nepdate-php/blob/main/docs/runbooks/release.md) | How a version is checked, tagged and published |
