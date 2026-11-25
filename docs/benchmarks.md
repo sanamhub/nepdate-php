@@ -1,7 +1,7 @@
 # Benchmarks
 
 B1 to B8 of `shared/spec/BENCHMARK.md` for this port, the two PHP libraries that
-[`docs/competitors.md`](competitors.md) selects, and the C# NepDate baseline from the hub. The run
+[`docs/competitors.md`](competitors.md) selects. The run
 is quiet: the machine was idle, the process was pinned to logical CPU 2 and the load was sampled
 before and during the run. It replaces the earlier preliminary figures.
 
@@ -31,23 +31,18 @@ the harness printed is `2026-11-16-php-8.3.36.txt` beside it, and the load sampl
 64 inputs per iteration, 20 measured iterations after a warm-up pass; `ns/op` is the mean per single
 operation. Every result is consumed by the harness, so nothing is optimised away.
 
-| ID | Operation | Unit | ns/op | sd | C# NepDate ns/op |
-|---|---|---|---:|---:|---:|
-| B1 | BS to AD: `fromBs`, then `toDateTime` | core | 986 | 31 | 13.27 |
-| B2 | AD to BS: `fromGregorian` | core | 785 | 198 | 18.70 |
-| B3 | add 1000 days | core | 935 | 253 | 20.06 |
-| B4 | add 13 months, `MonthOverflow::Clamp` | core | 726 | 75 | 19.30 |
-| B5 | long format, Nepali, with weekday | core | 554 | 4 | 139.04 |
-| B6 | strict parse of `YYYY/MM/DD` | core | 963 | 9 | 21.13 |
-| B7 | patro info (tithi, holiday, events) | patro | 323 | 5 | 48.63 |
-| B8 | patro month grid (every day of the month) | patro | 20,888 | 3,224 | 3,274.50 |
+| ID | Operation | Unit | ns/op | sd |
+|---|---|---|---:|---:|
+| B1 | BS to AD: `fromBs`, then `toDateTime` | core | 986 | 31 |
+| B2 | AD to BS: `fromGregorian` | core | 785 | 198 |
+| B3 | add 1000 days | core | 935 | 253 |
+| B4 | add 13 months, `MonthOverflow::Clamp` | core | 726 | 75 |
+| B5 | long format, Nepali, with weekday | core | 554 | 4 |
+| B6 | strict parse of `YYYY/MM/DD` | core | 963 | 9 |
+| B7 | patro info (tithi, holiday, events) | patro | 323 | 5 |
+| B8 | patro month grid (every day of the month) | patro | 20,888 | 3,224 |
 
-The C# column is the .NET 10 column of the hub's
-[`docs/benchmarks/dotnet.md`](https://github.com/sanamhub/nepdate/blob/main/docs/benchmarks/dotnet.md),
-measured on the same machine on 2026-11-16 with BenchmarkDotNet. BENCHMARK section 6 gives PHP no
-fixed target: "C, Dart, PHP, Zig: no fixed target: the numbers are reported beside C# NepDate and
-the selected competitors". PHP is an interpreter and runs this port 4 to 74 times slower than
-C# on B1 to B7; the table is reported as it is.
+The comparison with C# NepDate, the original library, and the target check from `spec/BENCHMARK.md` section 6 are in the hub: [performance page](https://nepdate.com/docs/project/performance/).
 
 B2, B3 and B8 vary more between iterations than the other rows (the sd column). A second run
 straight afterwards, not published, gave B1 to B8 of 1,002, 547, 787, 688, 561, 1,068, 320 and
